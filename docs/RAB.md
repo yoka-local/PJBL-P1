@@ -4,7 +4,7 @@ Berikut adalah estimasi Rencana Anggaran Biaya (RAB) untuk pembuatan prototipe *
 
 | No | Nama Komponen | Spesifikasi / Keterangan | Estimasi Harga (Rp) |
 |---|---|---|---|
-| 1 | ESP32 Development Board | NodeMCU WROOM-32 (38-pin / 30-pin) | 45.000 - 50.000 |
+| 1 | ESP32 Development Board | Disediakan oleh pihak sekolah | 0 |
 | 2 | Modul NFC RFID PN532 V3 | Membaca kartu NFC (e-Money, smart tag) & RFID | 55.000 - 65.000 |
 | 3 | Mini Solenoid Door Lock | Versi 5V (Dapat diaktifkan via charger HP biasa) | 30.000 - 35.000 |
 | 4 | Relay Module 1 Channel | 5V DC (Untuk mengontrol arus ke solenoid) | 6.000 - 8.000 |
@@ -15,6 +15,6 @@ Berikut adalah estimasi Rencana Anggaran Biaya (RAB) untuk pembuatan prototipe *
 | 9 | Komponen Pasif | LED (Merah & Hijau) + Resistor (220 Ohm) secukupnya| 3.000 - 5.000 |
 
 ### 🧮 Total Estimasi Biaya
-**Rp 169.000 — Rp 208.000**
+**Rp 124.000 — Rp 158.000**
 
 *Catatan: Harga dapat bervariasi bergantung pada toko di marketplace online. Untuk menekan biaya, daya akan diambil menggunakan charger smartphone 5V (minimal 2A) dan kabel USB bekas, sehingga tidak perlu membeli power supply 12V khusus.*
