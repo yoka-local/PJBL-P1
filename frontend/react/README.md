@@ -1,13 +1,32 @@
-# React Dashboard
+# React + TypeScript + Vite
 
-Not yet implemented — see [`../../docs/IMPLEMENTATION_PLAN.md`](../../docs/IMPLEMENTATION_PLAN.md)
-Phase 7 and [`../../docs/API.md`](../../docs/API.md) for the API it consumes.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-Setup once scaffolding a real project here (Vite + React + TypeScript + Tailwind):
+Currently, two official plugins are available:
 
-```bash
-npm create vite@latest . -- --template react-ts
-npm install
-npm install -D tailwindcss postcss autoprefixer
-npm run dev
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the Oxlint configuration
+
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
 ```
+
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
