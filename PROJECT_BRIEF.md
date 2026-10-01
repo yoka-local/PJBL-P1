@@ -2,25 +2,26 @@
 
 ## Project
 
-**SMART NFC ATTENDANCE & DOOR ACCESS SYSTEM**
+**NEXUSGATE: ADVANCED IOT ATTENDANCE & DOOR ACCESS SYSTEM**
 
-**Subtitle:** Sistem Absensi dan Kontrol Akses Pintu Berbasis ESP32
+**Subtitle:** Sistem Absensi dan Kontrol Akses Pintu Inovatif Berbasis ESP32
 
 ## 1. Project Overview
 
-Build an IoT-based attendance and door access control system using an ESP32 and NFC/RFID cards.
+Build an enterprise-grade IoT-based attendance and door access control system using an ESP32 and NFC/RFID cards, designed as a highly scalable PJBL project.
 
-The system combines:
+The system combines core functionalities with modern IoT innovations:
 
 * NFC/RFID-based student identification
-* Automatic door access control
-* Attendance recording
-* Physical door-state detection
-* Offline-first operation
-* Automatic synchronization when connectivity returns
-* Laravel REST API backend
-* Database-backed attendance records
-* React dashboard for administration and monitoring
+* Automatic door access control & door-state detection
+* Offline-first operation with automatic synchronization
+* Laravel REST API backend & React dashboard
+* **Real-time Telegram/WhatsApp Notifications**
+* **Smart Wi-Fi Captive Portal for headless setup**
+* **Anti-Passback & Cooldown logic to prevent "titip absen"**
+* **Role-Based Time Access (School hours vs 24/7 access)**
+* **Door Ajar / Forced Open Alarms**
+* **Over-The-Air (OTA) Firmware Updates**
 
 The project is intended as a school PJBL project and should be implemented as a clean, modular, professional system rather than a simple Arduino prototype.
 
