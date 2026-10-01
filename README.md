@@ -9,7 +9,7 @@ Sistem absensi IoT tingkat enterprise dan kontrol akses pintu yang dibangun deng
 - Siswa melakukan tap kartu NFC (seperti smart tag, e-toll) atau kartu RFID sebagai cadangan pada perangkat di pintu.
 - ESP32 memvalidasi kartu, membuka kunci pintu, dan mencatat event absensi.
 - Reed switch melacak status pintu terbuka/tertutup dan mengunci kembali secara otomatis.
-- Perangkat bekerja secara **offline-first**: data absensi tidak akan pernah hilang karena gangguan Wi-Fi/server, dan event yang antri akan disinkronkan secara otomatis (tanpa duplikasi) begitu konektivitas kembali.
+- Perangkat bekerja secara **offline-first (dengan offline backup)**: data absensi tidak akan pernah hilang karena gangguan Wi-Fi/server. Data akan dicadangkan dengan aman secara lokal (via memori internal/SPIFFS/MicroSD), dan event yang antri akan disinkronkan secara otomatis (tanpa duplikasi) begitu konektivitas kembali.
 - Backend Laravel menjadi pusat data utama; dashboard React memberikan visibilitas kepada staf terkait absensi, kartu, siswa, dan status perangkat.
 
 ### 🚀 Fitur & Inovasi Utama

@@ -14,7 +14,7 @@ Sistem ini menggabungkan fungsi inti dengan inovasi IoT modern:
 
 * Identifikasi siswa menggunakan teknologi cerdas NFC (e-money, smart tag) & RFID
 * Kontrol akses pintu otomatis & pendeteksian status pintu secara real-time
-* Operasi offline-first dengan sinkronisasi otomatis ke server
+* Operasi offline-first (dilengkapi offline backup / penyimpanan lokal) dengan sinkronisasi otomatis ke server
 * Backend REST API Laravel & dashboard admin React
 * **Notifikasi Telegram/WhatsApp Real-time**
 * **Smart Wi-Fi Captive Portal untuk setup tanpa hardcode**
