@@ -24,6 +24,7 @@ Sistem absensi IoT tingkat enterprise dan kontrol akses pintu yang dibangun deng
 Full requirements: [`PROJECT_BRIEF.md`](./PROJECT_BRIEF.md).
 Build plan: [`docs/IMPLEMENTATION_PLAN.md`](./docs/IMPLEMENTATION_PLAN.md).
 MVP scope: [`docs/MVP.md`](./docs/MVP.md).
+RAB & Komponen: [`docs/RAB.md`](./docs/RAB.md).
 
 ## Repository structure
 
@@ -35,6 +36,7 @@ Proyek-5-PJBL/
 ├── docs/
 │   ├── IMPLEMENTATION_PLAN.md   ← start here
 │   ├── MVP.md
+│   ├── RAB.md
 │   ├── ARCHITECTURE.md
 │   ├── HARDWARE.md
 │   ├── FIRMWARE.md
