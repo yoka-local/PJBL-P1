@@ -6,7 +6,7 @@ export default function Dashboard() {
       <div className="mb-8 flex justify-between items-end">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Overview Hari Ini</h2>
-          <p className="text-slate-500 mt-1">Pantau status akses pintu dan kehadiran siswa secara real-time.</p>
+          <p className="text-slate-500 mt-1">Pantau status akses pintu dan kehadiran pengguna secara real-time.</p>
         </div>
         <div className="text-right">
           <p className="text-sm text-slate-500">Status Perangkat</p>
@@ -18,8 +18,8 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <StatCard title="Total Hadir" value="342" subtitle="Siswa" color="text-green-600" bg="bg-green-100" />
-        <StatCard title="Terlambat" value="12" subtitle="Siswa" color="text-yellow-600" bg="bg-yellow-100" />
+        <StatCard title="Total Hadir" value="342" subtitle="Pengguna" color="text-green-600" bg="bg-green-100" />
+        <StatCard title="Terlambat" value="12" subtitle="Pengguna" color="text-yellow-600" bg="bg-yellow-100" />
         <StatCard title="Kartu Ditolak" value="3" subtitle="Percobaan" color="text-red-600" bg="bg-red-100" />
         <StatCard title="Status Pintu" value="Terkunci" subtitle="Aman" icon={<DoorOpen className="w-6 h-6 text-primary" />} color="text-primary" bg="bg-primary/10" />
       </div>
@@ -33,17 +33,17 @@ export default function Dashboard() {
             <thead>
               <tr className="bg-slate-50 text-slate-500 text-sm">
                 <th className="px-6 py-3 font-medium">Waktu</th>
-                <th className="px-6 py-3 font-medium">Nama Siswa</th>
-                <th className="px-6 py-3 font-medium">Kelas</th>
+                <th className="px-6 py-3 font-medium">Nama</th>
+                <th className="px-6 py-3 font-medium">Departemen</th>
                 <th className="px-6 py-3 font-medium">UID Kartu</th>
                 <th className="px-6 py-3 font-medium">Status</th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-slate-100">
-              <TableRow time="07:14:22" name="Budi Santoso" class_="XI-RPL-1" uid="A1:B2:C3:D4" status="Diterima" />
-              <TableRow time="07:15:05" name="Siti Aminah" class_="XI-TKJ-2" uid="E5:F6:G7:H8" status="Diterima" />
+              <TableRow time="07:14:22" name="Budi Santoso" class_="IT Support" uid="A1:B2:C3:D4" status="Diterima" />
+              <TableRow time="07:15:05" name="Siti Aminah" class_="Finance" uid="E5:F6:G7:H8" status="Diterima" />
               <TableRow time="07:22:11" name="Tidak Dikenal" class_="-" uid="X9:Y8:Z7:W6" status="Ditolak" />
-              <TableRow time="07:25:30" name="Andi Wijaya" class_="X-RPL-2" uid="12:34:56:78" status="Diterima" />
+              <TableRow time="07:25:30" name="Andi Wijaya" class_="HRD" uid="12:34:56:78" status="Diterima" />
             </tbody>
           </table>
         </div>

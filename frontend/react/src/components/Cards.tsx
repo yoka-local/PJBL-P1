@@ -16,8 +16,8 @@ export default function Cards() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Sample Card UI for demonstration */}
         {[
-          { uid: 'A1:B2:C3:D4', owner: 'Budi Santoso', role: 'Siswa', active: true },
-          { uid: 'E5:F6:G7:H8', owner: 'Pak Guru', role: 'Admin (24/7)', active: true },
+          { uid: 'A1:B2:C3:D4', owner: 'Budi Santoso', role: 'Pegawai (Shift Pagi)', active: true },
+          { uid: 'E5:F6:G7:H8', owner: 'Pak Manajer', role: 'Admin (24/7)', active: true },
           { uid: 'X9:Y8:Z7:W6', owner: '-', role: 'Unassigned', active: false },
         ].map((card, i) => (
           <div key={i} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">

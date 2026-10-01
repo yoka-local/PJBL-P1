@@ -36,7 +36,7 @@ export default function Logs() {
                 <tr key={i} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-mono text-xs text-slate-400">EVT-{1000 + i}</td>
                   <td className="px-6 py-4 text-slate-500">01 Okt, 07:{10 + i}:{22 + i}</td>
-                  <td className="px-6 py-4 font-medium text-slate-800">Siswa {i + 1}</td>
+                  <td className="px-6 py-4 font-medium text-slate-800">Pengguna {i + 1}</td>
                   <td className="px-6 py-4 font-mono text-xs text-slate-500">A1:B2:C{i}:D4</td>
                   <td className="px-6 py-4 text-slate-500">GATE-01</td>
                   <td className="px-6 py-4">

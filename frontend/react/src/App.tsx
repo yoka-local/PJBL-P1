@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { LayoutDashboard, Users, CreditCard, Activity, Settings, Bell, Search, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Users as UsersIcon, CreditCard, Activity, Settings, Bell, Search, ShieldCheck } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Logs from './components/Logs';
-import Students from './components/Students';
+import Users from './components/Users';
 import Cards from './components/Cards';
 import SettingsView from './components/Settings';
 
@@ -13,7 +13,7 @@ function App() {
     switch (activeTab) {
       case 'dashboard': return <Dashboard />;
       case 'logs': return <Logs />;
-      case 'students': return <Students />;
+      case 'users': return <Users />;
       case 'cards': return <Cards />;
       case 'settings': return <SettingsView />;
       default: return <Dashboard />;
@@ -32,7 +32,7 @@ function App() {
         <nav className="flex-1 px-4 py-6 space-y-2">
           <NavItem icon={<LayoutDashboard />} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
           <NavItem icon={<Activity />} label="Log Absensi" active={activeTab === 'logs'} onClick={() => setActiveTab('logs')} />
-          <NavItem icon={<Users />} label="Data Siswa" active={activeTab === 'students'} onClick={() => setActiveTab('students')} />
+          <NavItem icon={<UsersIcon />} label="Data Pengguna" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
           <NavItem icon={<CreditCard />} label="Kartu Akses" active={activeTab === 'cards'} onClick={() => setActiveTab('cards')} />
           <NavItem icon={<Settings />} label="Pengaturan" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
         </nav>
@@ -58,7 +58,7 @@ function App() {
             </div>
             <div className="flex items-center gap-3 pl-6 border-l border-slate-200">
               <div className="text-right">
-                <p className="text-sm font-semibold text-slate-700">Admin Sekolah</p>
+                <p className="text-sm font-semibold text-slate-700">Manajer Operasional</p>
                 <p className="text-xs text-slate-500">Administrator</p>
               </div>
               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">
