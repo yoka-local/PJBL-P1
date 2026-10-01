@@ -1,27 +1,25 @@
-# NexusGate: Advanced IoT Attendance & Door Access System
+# NexusGate: Sistem Absensi & Kontrol Akses Pintar (NFC)
 
 **Sistem Absensi dan Kontrol Akses Pintu Inovatif Berbasis ESP32**
 
-An enterprise-grade IoT attendance and door-access system built with an ESP32 + RC522 RFID reader, a Laravel REST API backend, and a React dashboard. Built as a school PJBL project, structured as a highly scalable, real-world modular system integrating modern IoT innovations.
+Sistem absensi IoT tingkat enterprise dan kontrol akses pintu yang dibangun dengan ESP32 + modul pembaca NFC/RFID (Prioritas NFC, dengan dukungan backup RFID), backend REST API Laravel, dan dashboard React. Dibangun sebagai proyek PJBL sekolah, terstruktur sebagai sistem modular dunia nyata yang sangat skalabel dan mengintegrasikan inovasi IoT modern.
 
-## What it does
+## Cara Kerjanya
 
-- Students tap an RFID/NFC card at the door.
-- The ESP32 validates the card, unlocks the door, and records an attendance event.
-- A reed switch tracks door open/closed state and re-locks automatically.
-- The device works **offline-first**: attendance is never lost due to Wi-Fi/server outages, and
-  queued events sync automatically (without duplication) once connectivity returns.
-- A Laravel backend is the source of truth; a React dashboard gives staff visibility into
-  attendance, cards, students, and device status.
+- Siswa melakukan tap kartu NFC (seperti smart tag, e-toll) atau kartu RFID sebagai cadangan pada perangkat di pintu.
+- ESP32 memvalidasi kartu, membuka kunci pintu, dan mencatat event absensi.
+- Reed switch melacak status pintu terbuka/tertutup dan mengunci kembali secara otomatis.
+- Perangkat bekerja secara **offline-first**: data absensi tidak akan pernah hilang karena gangguan Wi-Fi/server, dan event yang antri akan disinkronkan secara otomatis (tanpa duplikasi) begitu konektivitas kembali.
+- Backend Laravel menjadi pusat data utama; dashboard React memberikan visibilitas kepada staf terkait absensi, kartu, siswa, dan status perangkat.
 
-### 🚀 Key Innovations & Features
+### 🚀 Fitur & Inovasi Utama
 
-- **Real-Time Telegram Notifications**: Instant alerts sent to administrators or parents upon student arrival, or when security anomalies occur.
-- **Smart Wi-Fi Captive Portal**: No hardcoded credentials. Connect to the ESP32's self-hosted setup page to dynamically configure Wi-Fi networks.
-- **Anti-Passback & Cooldown**: Smart backend logic prevents "Titip Absen" (buddy punching) by enforcing a 5-minute cooldown per card.
-- **Role-Based & Time-Based Access**: Granular access control where student cards only work during school hours, while admin cards have 24/7 access.
-- **Door Ajar Alarm**: Hardware monitoring triggers local alarms and backend alerts if the door is held open beyond the configured timeout.
-- **Over-The-Air (OTA) Updates**: Seamless wireless firmware updates managed remotely, minimizing physical maintenance.
+- **Notifikasi Telegram Real-Time**: Pemberitahuan instan dikirim ke administrator atau orang tua saat siswa tiba, atau ketika terjadi anomali keamanan.
+- **Smart Wi-Fi Captive Portal**: Tidak perlu hardcode kredensial Wi-Fi. Cukup hubungkan HP ke hotspot ESP32 untuk mengatur Wi-Fi secara dinamis melalui web interface.
+- **Anti-Passback & Cooldown**: Logika cerdas di backend untuk mencegah kecurangan "Titip Absen" dengan memberlakukan jeda waktu (cooldown) 5 menit untuk setiap kartu.
+- **Akses Berbasis Peran & Waktu**: Kontrol akses terperinci di mana kartu siswa hanya berfungsi untuk masuk selama jam sekolah, sedangkan kartu admin memiliki akses 24/7.
+- **Alarm Pintu Terbuka (Door Ajar)**: Sensor mendeteksi jika pintu sengaja ditahan terbuka terlalu lama dan akan memicu alarm lokal serta mengirim peringatan ke backend.
+- **Pembaruan Over-The-Air (OTA)**: Pembaruan sistem (firmware) nirkabel secara langsung tanpa perlu mencolok kabel USB, meminimalkan pemeliharaan perangkat.
 
 Full requirements: [`PROJECT_BRIEF.md`](./PROJECT_BRIEF.md).
 Build plan: [`docs/IMPLEMENTATION_PLAN.md`](./docs/IMPLEMENTATION_PLAN.md).

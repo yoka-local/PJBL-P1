@@ -2,26 +2,26 @@
 
 ## Project
 
-**NEXUSGATE: ADVANCED IOT ATTENDANCE & DOOR ACCESS SYSTEM**
+**NEXUSGATE: SISTEM ABSENSI & KONTROL AKSES PINTAR (NFC)**
 
 **Subtitle:** Sistem Absensi dan Kontrol Akses Pintu Inovatif Berbasis ESP32
 
 ## 1. Project Overview
 
-Build an enterprise-grade IoT-based attendance and door access control system using an ESP32 and NFC/RFID cards, designed as a highly scalable PJBL project.
+Membangun sistem kontrol akses pintu dan absensi berbasis IoT tingkat enterprise menggunakan ESP32 dan teknologi NFC (sebagai prioritas utama) serta RFID (sebagai cadangan), dirancang sebagai proyek PJBL yang sangat skalabel.
 
-The system combines core functionalities with modern IoT innovations:
+Sistem ini menggabungkan fungsi inti dengan inovasi IoT modern:
 
-* NFC/RFID-based student identification
-* Automatic door access control & door-state detection
-* Offline-first operation with automatic synchronization
-* Laravel REST API backend & React dashboard
-* **Real-time Telegram/WhatsApp Notifications**
-* **Smart Wi-Fi Captive Portal for headless setup**
-* **Anti-Passback & Cooldown logic to prevent "titip absen"**
-* **Role-Based Time Access (School hours vs 24/7 access)**
-* **Door Ajar / Forced Open Alarms**
-* **Over-The-Air (OTA) Firmware Updates**
+* Identifikasi siswa menggunakan teknologi cerdas NFC (e-money, smart tag) & RFID
+* Kontrol akses pintu otomatis & pendeteksian status pintu secara real-time
+* Operasi offline-first dengan sinkronisasi otomatis ke server
+* Backend REST API Laravel & dashboard admin React
+* **Notifikasi Telegram/WhatsApp Real-time**
+* **Smart Wi-Fi Captive Portal untuk setup tanpa hardcode**
+* **Logika Anti-Passback & Cooldown untuk mencegah "titip absen"**
+* **Akses Berbasis Peran & Waktu (Jam sekolah vs akses 24/7)**
+* **Alarm Pintu Terpaksa / Terbuka Lama (Door Ajar)**
+* **Pembaruan Firmware Over-The-Air (OTA)**
 
 The project is intended as a school PJBL project and should be implemented as a clean, modular, professional system rather than a simple Arduino prototype.
 
