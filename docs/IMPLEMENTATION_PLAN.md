@@ -17,18 +17,18 @@ MVP checklist (Section 17) and Definition of Done (Section 20) are both green.
 
 **Goal:** A clean, buildable skeleton everyone on the team can clone and run.
 
-- [ ] Confirm repo structure matches Section 15 (already scaffolded — see below).
-- [ ] Initialize `firmware/esp32` as a PlatformIO project (preferred over raw Arduino IDE for
+- [x] Confirm repo structure matches Section 15 (already scaffolded — see below).
+- [x] Initialize `firmware/esp32` as a PlatformIO project (preferred over raw Arduino IDE for
       dependency management, unit tests, and CI later) OR document the Arduino IDE board/library
       setup in `docs/FIRMWARE.md` if PlatformIO isn't available.
-- [ ] Initialize `backend/laravel` with `composer create-project laravel/laravel .` and confirm
+- [x] Initialize `backend/laravel` with `composer create-project laravel/laravel .` and confirm
       it boots locally (`php artisan serve`).
-- [ ] Initialize `frontend/react` with Vite + React + TypeScript + Tailwind.
-- [ ] Add root `.gitignore` covering `node_modules/`, `vendor/`, `.env`, PlatformIO `.pio/`,
+- [x] Initialize `frontend/react` with Vite + React + TypeScript + Tailwind.
+- [x] Add root `.gitignore` covering `node_modules/`, `vendor/`, `.env`, PlatformIO `.pio/`,
       build artifacts, and IDE folders (already added — see below).
-- [ ] Add `.env.example` files (backend and firmware config header) — never commit real secrets
+- [x] Add `.env.example` files (backend and firmware config header) — never commit real secrets
       (Section 13).
-- [ ] Agree on the API contract shape (Section 11/5) as a living doc in `docs/API.md` *before*
+- [x] Agree on the API contract shape (Section 11/5) as a living doc in `docs/API.md` *before*
       firmware and backend diverge — this is the seam between the two halves of the team.
 
 **Exit check:** `php artisan serve`, `npm run dev`, and an empty ESP32 sketch all build/run with
