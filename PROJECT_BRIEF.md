@@ -12,14 +12,15 @@ Membangun sistem kontrol akses pintu dan absensi berbasis IoT tingkat enterprise
 
 Sistem ini menggabungkan fungsi inti dengan inovasi IoT modern:
 
-* Identifikasi siswa menggunakan teknologi cerdas NFC (e-money, smart tag) & RFID
+* Identifikasi pegawai menggunakan teknologi cerdas NFC (e-money, smart tag) & RFID
 * Kontrol akses pintu otomatis & pendeteksian status pintu secara real-time
 * Operasi offline-first (dilengkapi offline backup / penyimpanan lokal) dengan sinkronisasi otomatis ke server
-* Backend REST API Laravel & dashboard admin React
-* **Notifikasi Telegram/WhatsApp Real-time**
+* Backend REST API Laravel & dashboard React dengan Autentikasi Multi-Role
+* **Portal Administrator & Karyawan (Laporan Absensi Bulanan Mandiri)**
+* **Notifikasi Email & In-App Dashboard (Menggantikan Telegram/WhatsApp)**
 * **Smart Wi-Fi Captive Portal untuk setup tanpa hardcode**
 * **Logika Anti-Passback & Cooldown untuk mencegah "titip absen"**
-* **Akses Berbasis Peran & Waktu (Jam sekolah vs akses 24/7)**
+* **Akses Berbasis Peran & Waktu (Jam kerja vs akses 24/7)**
 * **Alarm Pintu Terpaksa / Terbuka Lama (Door Ajar)**
 * **Pembaruan Firmware Over-The-Air (OTA)**
 

@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+dist/
+
+# Laravel/PHP
+vendor/
+.env
+
+# PlatformIO
+.pio/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Build artifacts
+build/

@@ -14,11 +14,12 @@ Sistem absensi IoT tingkat enterprise dan kontrol akses pintu yang dibangun deng
 
 ### 🚀 Fitur & Inovasi Utama
 
-- **Notifikasi Telegram Real-Time**: Pemberitahuan instan dikirim ke administrator atau orang tua saat siswa tiba, atau ketika terjadi anomali keamanan.
+- **Portal Karyawan & Administrator**: Sistem login multi-role. Karyawan dapat memantau ringkasan absensi bulanannya (hadir, absen, dll) secara mandiri, sementara Administrator memiliki kontrol penuh (CRUD) atas seluruh data.
+- **Sistem Notifikasi Email & In-App**: Menggantikan notifikasi Telegram/WhatsApp dengan pengiriman Email otomatis dan peringatan di dalam Dashboard (In-App Bell) untuk menghindari ketergantungan pada aplikasi pihak ketiga.
 - **Smart Wi-Fi Captive Portal**: Tidak perlu hardcode kredensial Wi-Fi. Cukup hubungkan HP ke hotspot ESP32 untuk mengatur Wi-Fi secara dinamis melalui web interface.
 - **Anti-Passback & Cooldown**: Logika cerdas di backend untuk mencegah kecurangan "Titip Absen" dengan memberlakukan jeda waktu (cooldown) 5 menit untuk setiap kartu.
-- **Akses Berbasis Peran & Waktu**: Kontrol akses terperinci di mana kartu siswa hanya berfungsi untuk masuk selama jam sekolah, sedangkan kartu admin memiliki akses 24/7.
-- **Alarm Pintu Terbuka (Door Ajar)**: Sensor mendeteksi jika pintu sengaja ditahan terbuka terlalu lama dan akan memicu alarm lokal serta mengirim peringatan ke backend.
+- **Akses Berbasis Peran & Waktu**: Kontrol akses terperinci di mana kartu karyawan/shift pagi hanya berfungsi pada jam tertentu, sedangkan kartu admin memiliki akses 24/7.
+- **Alarm Pintu Terbuka (Door Ajar)**: Sensor mendeteksi jika pintu sengaja ditahan terbuka terlalu lama dan akan memicu alarm lokal serta peringatan.
 - **Pembaruan Over-The-Air (OTA)**: Pembaruan sistem (firmware) nirkabel secara langsung tanpa perlu mencolok kabel USB, meminimalkan pemeliharaan perangkat.
 
 Full requirements: [`PROJECT_BRIEF.md`](./PROJECT_BRIEF.md).
