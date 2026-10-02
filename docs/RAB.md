@@ -3,7 +3,7 @@
 Berikut adalah estimasi Rencana Anggaran Biaya (RAB) untuk pembuatan prototipe *smart door* NexusGate dengan target anggaran di bawah Rp 200.000. Komponen difokuskan pada penggunaan teknologi NFC sebagai prioritas utama.
 
 | No | Nama Komponen | Spesifikasi / Keterangan | Estimasi Harga (Rp) | Check List |
-|---|---|---|---|
+|---|---|---|---|---|
 | 1 | ESP32 Development Board | NodeMCU WROOM-32 (Disediakan oleh sekolah) | 45.000 - 50.000 | [] |
 | 2 | Modul NFC RFID PN532 V3 | Membaca kartu NFC (e-Money, smart tag) & RFID | 55.000 - 65.000 | [] | 
 | 3 | Mini Solenoid Door Lock | Versi 5V (Dapat diaktifkan via charger HP biasa) | 30.000 - 35.000 | [] |
