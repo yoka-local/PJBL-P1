@@ -32,6 +32,11 @@
 #define WIFI_PASSWORD "Your_WiFi_Password"
 #define WIFI_RETRY_INTERVAL_MS 5000 // Initial backoff interval
 
+// API Settings
+#define DEVICE_ID "GATE-01"
+#define API_URL "http://192.168.1.100:8000/api/attendance/tap"
+#define API_TOKEN "your_sanctum_token_here"
+
 // ==========================================
 // LOGGING CONVENTION
 // ==========================================
