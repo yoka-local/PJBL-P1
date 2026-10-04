@@ -41,12 +41,12 @@ no errors.
 **Goal:** Bare ESP32 connects to Wi-Fi and logs to serial. No sensors yet.
 
 Tasks:
-- [ ] Board bring-up, correct board profile in `platformio.ini` (or Arduino IDE board manager).
-- [ ] Serial logging convention (e.g. `[WIFI]`, `[RFID]`, `[DOOR]`, `[SYNC]` prefixes) — decide
+- [x] Board bring-up, correct board profile in `platformio.ini` (or Arduino IDE board manager).
+- [x] Serial logging convention (e.g. `[WIFI]`, `[RFID]`, `[DOOR]`, `[SYNC]` prefixes) — decide
       this now, it pays off during Phase 5/8 debugging.
-- [ ] Wi-Fi connect/reconnect logic with backoff (don't block forever if Wi-Fi is down — this is
+- [x] Wi-Fi connect/reconnect logic with backoff (don't block forever if Wi-Fi is down — this is
       a preview of the offline-first requirement in Section 6).
-- [ ] `config.h`/`Config` module holding all pin assignments and tunable constants (this is where
+- [x] `config.h`/`Config` module holding all pin assignments and tunable constants (this is where
       the 10s/30s timeouts from Section 4 will live later — Section 4 explicitly asks for
       configurable constants, not hard-coded delays).
 
@@ -59,16 +59,16 @@ Tasks:
 **Goal:** Reliable UID reads, mapped against a local "known cards" table.
 
 Tasks:
-- [ ] Wire RC522 over SPI per `docs/HARDWARE.md` pinout.
-- [ ] `RfidReader` module: initialize, poll/interrupt for new card, return normalized UID string
+- [x] Wire RC522 over SPI per `docs/HARDWARE.md` pinout.
+- [x] `RfidReader` module: initialize, poll/interrupt for new card, return normalized UID string
       (consistent casing/format, e.g. `04:A3:92:7F` as in the brief's example event).
-- [ ] Debounce repeated reads of the same card held near the reader (avoid firing 10 events for
+- [x] Debounce repeated reads of the same card held near the reader (avoid firing 10 events for
       one tap).
-- [ ] Local card table stub — for now, a hardcoded or SPIFFS/LittleFS-loaded list of
+- [x] Local card table stub — for now, a hardcoded or SPIFFS/LittleFS-loaded list of
       `{card_uid, student_id, active}`; this becomes the offline authorization cache once Phase 5
       lands. Loading this table is a full sub-task in itself (sync down from backend on boot /
       Wi-Fi reconnect).
-- [ ] Card validation logic: registered+active → accept; unregistered or inactive → reject.
+- [x] Card validation logic: registered+active → accept; unregistered or inactive → reject.
 
 **Tests (Section 18 — Authentication):** registered card, unregistered card, disabled card.
 
@@ -79,16 +79,16 @@ Tasks:
 **Goal:** A valid card tap produces a well-formed, uniquely-identified event object in memory.
 
 Tasks:
-- [ ] `AttendanceEvent` struct/class matching the JSON shape in Section 5 exactly
+- [x] `AttendanceEvent` struct/class matching the JSON shape in Section 5 exactly
       (`event_id`, `student_id`, `card_uid`, `timestamp`, `device_id`, `status`).
-- [ ] `event_id` generation: must be unique per event and stable across retries of the *same*
+- [x] `event_id` generation: must be unique per event and stable across retries of the *same*
       event (i.e., generated once at creation time, not regenerated on each sync retry — this is
       what makes the idempotency key in Section 7 work). A UUID or hash of
       `(device_id, card_uid, timestamp, monotonic counter)` works well on ESP32.
-- [ ] Timestamp source: RTC via NTP once Wi-Fi is up; document fallback behavior for offline taps
+- [x] Timestamp source: RTC via NTP once Wi-Fi is up; document fallback behavior for offline taps
       (e.g., millis()-since-boot + last-known-NTP-offset, corrected on next sync) in
       `docs/FIRMWARE.md` — this is a real design decision, not a footnote.
-- [ ] `device_id` fixed per-device constant, set in `config.h`.
+- [x] `device_id` fixed per-device constant, set in `config.h`.
 
 **Exit check:** A test card tap prints a well-formed JSON event to serial matching the brief's
 example exactly.
@@ -102,18 +102,18 @@ example exactly.
 States: `LOCKED → UNLOCKED_WAITING → DOOR_OPEN → LOCKED`, with the two timeout branches.
 
 Tasks:
-- [ ] `DoorController` module implemented as an explicit `enum class DoorState` +
+- [x] `DoorController` module implemented as an explicit `enum class DoorState` +
       `switch`/state-table update function called every loop tick (non-blocking — Section 4's
       whole point is avoiding blocking delays that would freeze RFID polling and networking).
-- [ ] Lock driver output goes through the ESP32 GPIO → MOSFET/relay driver → lock, never GPIO
+- [x] Lock driver output goes through the ESP32 GPIO → MOSFET/relay driver → lock, never GPIO
       directly to the lock (Section 8's hardware rule) — flag this in `docs/HARDWARE.md` with a
       wiring diagram.
-- [ ] Reed switch input with debounce.
-- [ ] `UNLOCKED_WAITING` timeout constant (~10s, configurable) → auto-relock if the door never
+- [x] Reed switch input with debounce.
+- [x] `UNLOCKED_WAITING` timeout constant (~10s, configurable) → auto-relock if the door never
       opens.
-- [ ] `DOOR_OPEN` timeout constant (~30s, configurable) → warning buzzer while continuing to
+- [x] `DOOR_OPEN` timeout constant (~30s, configurable) → warning buzzer while continuing to
       monitor the reed switch, relock immediately when it closes.
-- [ ] LED/buzzer feedback wired to state transitions (green = access granted, red = rejected,
+- [x] LED/buzzer feedback wired to state transitions (green = access granted, red = rejected,
       yellow = door-open warning, buzzer = reject + door-open-too-long).
 
 **Tests (Section 18 — Door):** opens after valid card; closes normally; never opens (timeout);
@@ -128,20 +128,20 @@ state machine forever, should keep buzzing and keep polling).
 highest-risk phase — budget the most review time here.
 
 Tasks:
-- [ ] Persistent local queue (LittleFS/SPIFFS on internal flash, or SD card if using the optional
+- [x] Persistent local queue (LittleFS/SPIFFS on internal flash, or SD card if using the optional
       hardware) storing pending `AttendanceEvent`s as JSON lines or small files keyed by
       `event_id`.
-- [ ] Write path: card validated → event created → **written to persistent storage before**
+- [x] Write path: card validated → event created → **written to persistent storage before**
       attempting any network call (never hold an event only in RAM, since a brownout or reset
       would lose it).
-- [ ] `SyncManager` module: on Wi-Fi connect (both at boot and on reconnect), iterate pending
+- [x] `SyncManager` module: on Wi-Fi connect (both at boot and on reconnect), iterate pending
       events, POST each to `/api/attendance` with `Authorization: Bearer DEVICE_TOKEN`.
-- [ ] Delete-only-on-confirmation rule (Section 6): remove the local record **only** after
+- [x] Delete-only-on-confirmation rule (Section 6): remove the local record **only** after
       receiving a success response (`success: true`) from the server, including the
       `duplicate: true` case, which still counts as success per Section 11's example response.
-- [ ] Retry/backoff for failed sync attempts (network error, 5xx, timeout) — keep the local copy,
+- [x] Retry/backoff for failed sync attempts (network error, 5xx, timeout) — keep the local copy,
       retry later, do not spin-retry tightly (respect device and server resources).
-- [ ] Cap and monitor local storage usage; decide and document a policy for what happens if the
+- [x] Cap and monitor local storage usage; decide and document a policy for what happens if the
       queue fills up (unlikely for a school demo, but note it in `docs/FIRMWARE.md` as a known
       limitation rather than silently dropping events).
 
@@ -158,27 +158,27 @@ already contains the event.
 ingestion.
 
 Tasks:
-- [ ] Migrations for `students`, `cards`, `attendance`, `devices` exactly per Section 10, with a
+- [x] Migrations for `students`, `cards`, `attendance`, `devices` exactly per Section 10, with a
       **unique constraint on `attendance.event_id`** — this is not optional, it's what makes
       Section 7's duplicate protection actually enforceable at the database level instead of only
       in application code.
-- [ ] Eloquent models + relationships (`Student hasMany Card`, `Student hasMany Attendance`, etc.)
-- [ ] Device/API authentication: Laravel Sanctum personal access tokens (or a simple custom
+- [x] Eloquent models + relationships (`Student hasMany Card`, `Student hasMany Attendance`, etc.)
+- [x] Device/API authentication: Laravel Sanctum personal access tokens (or a simple custom
       bearer-token middleware) issuing one `DEVICE_TOKEN` per device row — see Section 12,
       explicitly *not* the card UID.
-- [ ] `POST /api/attendance` — validate payload shape, look up `event_id`:
+- [x] `POST /api/attendance` — validate payload shape, look up `event_id`:
   - not found → create attendance row, return `{success: true, event_id, message}`.
   - found → return `{success: true, event_id, duplicate: true, message}` **without** inserting
     (Section 7's exact flow) — wrap the "check then insert" in a DB transaction or rely on the
     unique constraint + catch-the-duplicate-key-exception pattern to avoid a race condition
     between concurrent retries.
-- [ ] `GET /api/students`, `GET /api/cards`, `POST /api/cards` (register/activate/deactivate a
+- [x] `GET /api/students`, `GET /api/cards`, `POST /api/cards` (register/activate/deactivate a
       card), `GET /api/devices`, `POST /api/devices/heartbeat` (updates `last_seen` + `status`).
-- [ ] Input validation (Form Requests) on every endpoint — malformed request handling is an
+- [x] Input validation (Form Requests) on every endpoint — malformed request handling is an
       explicit test case in Section 18.
-- [ ] Structured JSON responses + correct HTTP status codes (200/201/401/403/404/422) per
+- [x] Structured JSON responses + correct HTTP status codes (200/201/401/403/404/422) per
       Section 11.
-- [ ] Access logging for attendance and card-management actions (Section 13).
+- [x] Access logging for attendance and card-management actions (Section 13).
 
 **Tests (Section 18 — Synchronization & Security):** successful create, duplicate event_id
 (same and differing payload), invalid/missing bearer token, unauthorized/unknown device,
