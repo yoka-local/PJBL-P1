@@ -1,6 +1,6 @@
-# Rencana Anggaran Biaya (RAB) - NexusGate
+# Rencana Anggaran Biaya (RAB) - NFCKey
 
-Berikut adalah estimasi Rencana Anggaran Biaya (RAB) untuk pembuatan prototipe *smart door* NexusGate dengan target anggaran di bawah Rp 200.000. Komponen difokuskan pada penggunaan teknologi NFC sebagai prioritas utama.
+Berikut adalah estimasi Rencana Anggaran Biaya (RAB) untuk pembuatan prototipe *smart door* NFCKey dengan target anggaran di bawah Rp 200.000. Komponen difokuskan pada penggunaan teknologi NFC sebagai prioritas utama.
 
 | No | Nama Komponen | Spesifikasi / Keterangan | Estimasi Harga (Rp) | Check List |
 |---|---|---|---|---|

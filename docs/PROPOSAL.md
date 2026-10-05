@@ -2,7 +2,7 @@
 
 ## Identitas Proyek
 - **Nama Kelompok:** Medan
-- **Judul Program:** NexusGate: Sistem Akses Pintu Cerdas dan Presensi Terintegrasi Berbasis NFC dan IoT
+- **Judul Program:** NFCKey: Sistem Akses Pintu Cerdas dan Presensi Terintegrasi Berbasis NFC dan IoT
 
 **Anggota Kelompok:**
 1. Mahardika Putra (0096724081) [ Ketua Kelompok ]
@@ -22,11 +22,11 @@ Dengan perkembangan teknologi *Internet of Things* (IoT) dan meluasnya penggunaa
 
 ## 2. Judul Program
 *Saran Judul Utama:*
-**NexusGate: Sistem Akses Pintu Cerdas dan Presensi Terintegrasi Berbasis NFC dan IoT**
+**NFCKey: Sistem Akses Pintu Cerdas dan Presensi Terintegrasi Berbasis NFC dan IoT**
 
 *Alternatif Judul:*
-1. **NexusGate:** Prototipe Sistem Keamanan Pintu dan Pencatatan Kehadiran Otomatis
-2. **NexusGate:** Smart NFC Attendance & Door Access System
+1. **NFCKey:** Prototipe Sistem Keamanan Pintu dan Pencatatan Kehadiran Otomatis
+2. **NFCKey:** Smart NFC Attendance & Door Access System
 
 ## 3. Jadwal Pelaksanaan
 - **Jadwal Pengerjaan:** Oktober - November
@@ -34,7 +34,7 @@ Dengan perkembangan teknologi *Internet of Things* (IoT) dan meluasnya penggunaa
 - **Jadwal Pengujian Hasil:** Minggu ke-2 November
 
 ## 4. Rancangan Prototype
-**NexusGate** adalah sistem gerbang pintar (*smart door*) berbasis mikrokontroler ESP32. Alur kerja sistem dirancang sebagai berikut:
+**NFCKey** adalah sistem gerbang pintar (*smart door*) berbasis mikrokontroler ESP32. Alur kerja sistem dirancang sebagai berikut:
 1. **Input Identitas:** Pengguna menempelkan kartu NFC/RFID pada modul pembaca (PN532/RC522).
 2. **Validasi & Eksekusi:** ESP32 memvalidasi ID kartu. Jika kartu terdaftar, ESP32 akan memicu relay untuk membuka *Solenoid Door Lock* (pintu terbuka).
 3. **Pencatatan Offline & Online:** Sistem mencatat data presensi (waktu dan ID) ke memori lokal ESP32, lalu mengirimkannya ke server backend (Laravel) melalui jaringan Wi-Fi untuk disimpan secara permanen.

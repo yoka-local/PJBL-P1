@@ -1,4 +1,4 @@
-# NexusGate: Sistem Absensi & Kontrol Akses Pintar (NFC)
+# NFCKey: Sistem Absensi & Kontrol Akses Pintar (NFC)
 
 **Sistem Absensi dan Kontrol Akses Pintu Inovatif Berbasis ESP32**
 

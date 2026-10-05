@@ -34,7 +34,7 @@ function App() {
         <div className="bg-white p-8 rounded-xl shadow-md w-96">
           <div className="flex items-center gap-3 justify-center text-primary mb-8">
             <ShieldCheck className="w-10 h-10" />
-            <h1 className="text-2xl font-bold tracking-wider text-slate-800">NexusGate</h1>
+            <h1 className="text-2xl font-bold tracking-wider text-slate-800">NFCKey</h1>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             {loginError && <div className="text-red-500 text-sm p-2 bg-red-50 rounded">{loginError}</div>}
@@ -70,7 +70,7 @@ function App() {
       <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col">
         <div className="p-6 flex items-center gap-3 text-white border-b border-slate-800">
           <ShieldCheck className="w-8 h-8 text-primary" />
-          <h1 className="text-xl font-bold tracking-wider">NexusGate</h1>
+          <h1 className="text-xl font-bold tracking-wider">NFCKey</h1>
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-2">

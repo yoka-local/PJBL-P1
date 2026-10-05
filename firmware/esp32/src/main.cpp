@@ -11,7 +11,7 @@ void setup() {
     delay(1000);
     Serial.println();
     
-    LOG_SYS("NexusGate ESP32 Starting...");
+    LOG_SYS("NFCKey ESP32 Starting...");
 
     // Initialize subsystems
     queue_init();
