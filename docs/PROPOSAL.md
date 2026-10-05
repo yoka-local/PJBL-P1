@@ -5,7 +5,7 @@
 - **Judul Program:** NexusGate: Sistem Akses Pintu Cerdas dan Presensi Terintegrasi Berbasis NFC dan IoT
 
 **Anggota Kelompok:**
-1. Mahardika Putra (0096724081)
+1. Mahardika Putra (0096724081) [ Ketua Kelompok ]
 2. Quinn Felicia Ghani Azalia (0109739201)
 3. Mentari Puja Carisha (3093931629)
 4. Maritza Cordelia Ardani (0102133417)
