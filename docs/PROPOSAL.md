@@ -2,18 +2,16 @@
 
 ## Identitas Proyek
 - **Nama Kelompok:** Medan
-- **Judul Program:** NFCKey: Sistem Akses Pintu Cerdas dan Presensi Terintegrasi Berbasis NFC dan IoT
+- **Judul Program:** **NFCKey: Smart NFC Attendance & Door Access System**
 
 **Anggota Kelompok:**
-1. Mahardika Putra (0096724081) [ Ketua Kelompok ]
-2. Quinn Felicia Ghani Azalia (0109739201)
-3. Mentari Puja Carisha (3093931629)
-4. Maritza Cordelia Ardani (0102133417)
-5. Ragnal Averroes A.R (0092383418)
-6. Muhammad Haidar Bima Aqil (0093458496)
-7. Rafa Lazuardi Alyamsah (0106276183)
-
----
+1. Mahardika Putra (01) [ Ketua Kelompok ]
+2. Quinn Felicia Ghani Azalia (18)
+3. Mentari Puja Carisha (03)
+4. Maritza Cordelia Ardani (02)
+5. Ragnal Averroes A.R (21)
+6. Muhammad Haidar Bima Aqil (10)
+7. Rafa Lazuardi Alyamsah (19)
 
 ## 1. Latar Belakang Masalah
 Sistem presensi dan keamanan pintu tradisional saat ini sering kali masih mengandalkan kunci fisik dan pencatatan manual. Sistem manual rentan terhadap manipulasi (seperti "titip absen"), kehilangan data, serta hilangnya kunci yang dapat mengancam keamanan ruangan. Selain itu, manajemen data kehadiran yang terpisah dari sistem keamanan akses pintu membuat pemantauan operasional menjadi kurang efisien.
@@ -21,12 +19,11 @@ Sistem presensi dan keamanan pintu tradisional saat ini sering kali masih mengan
 Dengan perkembangan teknologi *Internet of Things* (IoT) dan meluasnya penggunaan kartu pintar berteknologi *Near Field Communication* (NFC) (misalnya e-Money, kartu pelajar pintar), sistem akses dan presensi dapat digabungkan menjadi satu kesatuan. Diperlukan sebuah sistem terintegrasi yang mampu membaca identitas dari kartu NFC, membuka kunci pintu secara otomatis, sekaligus merekam waktu kehadiran langsung ke dalam basis data terpusat, bahkan dilengkapi fitur penyimpanan *offline* apabila jaringan internet sedang terputus.
 
 ## 2. Judul Program
-*Saran Judul Utama:*
-**NFCKey:** Smart NFC Attendance & Door Access System
+*Judul Utama:* **NFCKey: Smart NFC Attendance & Door Access System**
 
 ## 3. Jadwal Pelaksanaan
-- **Jadwal Pengerjaan:** Oktober - November
-- **Jadwal Monitoring:** Progress check dengan Bu Reny (minimal 3x pertemuan)
+- **Jadwal Pengerjaan:** Oktober – November
+- **Jadwal Monitoring:** 22 Oktober 2026, 1 November 2026, 8 November 2026.
 - **Jadwal Pengujian Hasil:** Minggu ke-2 November
 
 ## 4. Rancangan Prototype
@@ -58,11 +55,11 @@ Dengan perkembangan teknologi *Internet of Things* (IoT) dan meluasnya penggunaa
 
 ## 6. Kebutuhan Biaya & Cara Pemenuhan
 Berdasarkan Rencana Anggaran Biaya (RAB) yang telah dirancang:
-- **Kebutuhan Biaya:** Total estimasi biaya pengadaan komponen berkisar antara **Rp 169.000 — Rp 208.000**. Mengingat komponen utama (ESP32) akan disediakan dari sekolah (menghemat ~Rp 50.000), maka dana tunai riil yang perlu disiapkan hanya sekitar **Rp 124.000 — Rp 158.000**. 
+- **Kebutuhan Biaya:** Total estimasi biaya pengadaan komponen berkisar antara **Rp 169.000 — Rp 208.000**. Mengingat komponen utama (ESP32) akan disediakan dari sekolah (menghemat ~Rp 50.000), maka dana tunai riil yang perlu disiapkan hanya sekitar **Rp 124.000 — Rp 158.000**.
 - **Cara Pemenuhan:** Dana proyek akan dipenuhi menggunakan sistem **iuran bersama (patungan)** anggota kelompok. Dengan jumlah anggota 7 orang, iuran per orang diperkirakan hanya sebesar **Rp 20.000 — Rp 25.000**.
 
 ## 7. Referensi
-1. **Espressif Systems. (2023).** *ESP32 Documentation*. Diakses dari: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/
-2. **Random Nerd Tutorials. (2022).** *Security Access using MFRC522 RFID Reader with Arduino*. Diakses dari: https://randomnerdtutorials.com/security-access-using-mfrc522-rfid-reader-with-arduino/
-3. **Laravel Documentation. (2024).** *Laravel - The PHP Framework for Web Artisans*. Diakses dari: https://laravel.com/docs
-4. **React Documentation. (2024).** *React – A JavaScript library for building user interfaces*. Diakses dari: https://react.dev/
+1. **Espressif Systems. (2023).** *ESP32 Documentation*. Diakses dari: [https://docs.espressif.com/projects/esp-idf/en/latest/esp32/](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/)
+2. **Random Nerd Tutorials. (2022).** *Security Access using MFRC522 RFID Reader with Arduino*. Diakses dari: [https://randomnerdtutorials.com/security-access-using-mfrc522-rfid-reader-with-arduino/](https://randomnerdtutorials.com/security-access-using-mfrc522-rfid-reader-with-arduino/)
+3. **Laravel Documentation. (2024).** *Laravel - The PHP Framework for Web Artisans*. Diakses dari: [https://laravel.com/docs](https://laravel.com/docs)
+4. **React Documentation. (2024).** *React – A JavaScript library for building user interfaces*. Diakses dari: [https://react.dev/](https://react.dev/)
