@@ -22,11 +22,7 @@ Dengan perkembangan teknologi *Internet of Things* (IoT) dan meluasnya penggunaa
 
 ## 2. Judul Program
 *Saran Judul Utama:*
-**NFCKey: Sistem Akses Pintu Cerdas dan Presensi Terintegrasi Berbasis NFC dan IoT**
-
-*Alternatif Judul:*
-1. **NFCKey:** Prototipe Sistem Keamanan Pintu dan Pencatatan Kehadiran Otomatis
-2. **NFCKey:** Smart NFC Attendance & Door Access System
+**NFCKey:** Smart NFC Attendance & Door Access System
 
 ## 3. Jadwal Pelaksanaan
 - **Jadwal Pengerjaan:** Oktober - November
