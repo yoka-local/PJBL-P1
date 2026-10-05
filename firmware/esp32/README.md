@@ -1,23 +1,16 @@
-# ESP32 Firmware
+# 🔌 ESP32 Firmware
 
-Not yet implemented — see [`../../docs/IMPLEMENTATION_PLAN.md`](../../docs/IMPLEMENTATION_PLAN.md)
-Phases 1–5 and [`../../docs/FIRMWARE.md`](../../docs/FIRMWARE.md) for the module breakdown and
-design decisions (state machine, offline queue, sync manager, event_id generation).
+Firmware untuk mikrokontroler ESP32 pada sistem **NFCKey**.
 
-Planned layout (PlatformIO-style):
+## Komponen
+- `main.cpp` - Titik awal program
+- `wifi_manager.cpp` - Menangani koneksi Wi-Fi non-blocking
+- `rfid_reader.cpp` - Antarmuka MFRC522 (SPI)
+- `door_controller.cpp` - Mesin state untuk mengontrol solenoid dan reed switch
+- `event_queue.cpp` - Antrian event absensi offline-first (LittleFS/SPIFFS)
+- `sync_manager.cpp` - Menyinkronkan data offline ke Laravel backend
 
-```text
-firmware/esp32/
-├── platformio.ini
-├── src/
-│   ├── main.cpp
-│   ├── config.h
-│   ├── wifi_manager.*
-│   ├── rfid_reader.*
-│   ├── card_store.*
-│   ├── door_controller.*
-│   ├── event_queue.*
-│   ├── sync_manager.*
-│   └── feedback.*
-└── include/
-```
+## Cara Build
+Gunakan [PlatformIO](https://platformio.org/). Buka folder `firmware/esp32` di VS Code dengan ekstensi PlatformIO terinstal, lalu klik `Build` dan `Upload`.
+
+Untuk dokumentasi lengkap, silakan lihat [FIRMWARE.md](../../docs/FIRMWARE.md) dan [IMPLEMENTATION_PLAN.md](../../docs/IMPLEMENTATION_PLAN.md).

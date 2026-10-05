@@ -4,19 +4,18 @@
 
 Three components, one source of truth (the Laravel backend / database):
 
-```text
-        ┌─────────────┐        HTTPS (Bearer DEVICE_TOKEN)        ┌──────────────────┐
- Card →  │  ESP32 +    │ ───────────────────────────────────────► │  Laravel REST API │
-         │  RC522      │ ◄─────────────────────────────────────── │  + MySQL/SQLite   │
-         │  (edge node)│              JSON responses               └──────────────────┘
-         └─────────────┘                                                    ▲
-               │ local queue                                                │ REST (read/write)
-               │ (offline-first)                                            │
-               ▼                                                            │
-     LittleFS/SPIFFS pending events                                ┌──────────────────┐
-                                                                     │  React Dashboard │
-                                                                     │  (TS + Tailwind) │
-                                                                     └──────────────────┘
+```mermaid
+flowchart LR
+    subgraph Edge["Edge Node (Hardware)"]
+        A[NFC/RFID Card] --> B("ESP32 + RC522")
+        B -- "Local Validation\n& Event Creation" --> C[("LittleFS/SPIFFS\n(Offline Queue)")]
+        C -- "Drain/Retry" --> B
+    end
+
+    subgraph Server["Server & Web"]
+        B -- "HTTPS (Bearer Token)\nJSON Payload" --> D["Laravel REST API\n+ MySQL/SQLite"]
+        E["React Dashboard\n(TS + Tailwind)"] -- "REST\n(Read/Write)" --> D
+    end
 ```
 
 ## Component responsibilities

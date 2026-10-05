@@ -38,21 +38,21 @@ real building exit (see `PROJECT_BRIEF.md` Section 19).
 
 ## Pinout
 
-Fill in once wiring is finalized:
+Based on `firmware/esp32/src/config.h`:
 
 | Function | ESP32 Pin | Notes |
 |---|---|---|
-| RC522 SDA/SS | | |
-| RC522 SCK | | |
-| RC522 MOSI | | |
-| RC522 MISO | | |
-| RC522 RST | | |
-| Reed switch | | pull-up/pull-down? |
-| Lock driver (via MOSFET/relay) | | |
-| Buzzer | | |
-| Green LED | | |
-| Red LED | | |
-| Yellow LED | | |
+| RC522 SDA/SS | GPIO 5 | |
+| RC522 SCK | GPIO 18 | VSPI SCK |
+| RC522 MOSI | GPIO 23 | VSPI MOSI |
+| RC522 MISO | GPIO 19 | VSPI MISO |
+| RC522 RST | GPIO 22 | |
+| Reed switch | GPIO 27 | Input Pull-up |
+| Lock driver (Relay) | GPIO 26 | Output to MOSFET/Relay |
+| Buzzer | GPIO 14 | Active Buzzer |
+| Green LED | GPIO 32 | Access Granted |
+| Red LED | GPIO 33 | Access Denied |
+| Yellow LED | GPIO 25 | Door Ajar Warning |
 
 ## Diagrams
 

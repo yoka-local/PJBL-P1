@@ -1,67 +1,80 @@
-# NFCKey: Sistem Absensi & Kontrol Akses Pintar (NFC)
+# 🔐 NFCKey: Smart NFC Attendance & Door Access System
+
+<div align="center">
+  <img src="https://img.shields.io/badge/ESP32-Firmware-blue?style=for-the-badge&logo=espressif" alt="ESP32" />
+  <img src="https://img.shields.io/badge/Laravel-Backend-red?style=for-the-badge&logo=laravel" alt="Laravel" />
+  <img src="https://img.shields.io/badge/React-Frontend-61DAFB?style=for-the-badge&logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge" alt="Status" />
+</div>
+
+<br />
 
 **Sistem Absensi dan Kontrol Akses Pintu Inovatif Berbasis ESP32**
 
-Sistem absensi IoT tingkat enterprise dan kontrol akses pintu yang dibangun dengan ESP32 + modul pembaca NFC/RFID (Prioritas NFC, dengan dukungan backup RFID), backend REST API Laravel, dan dashboard React. Dibangun sebagai proyek PJBL sekolah, terstruktur sebagai sistem modular dunia nyata yang sangat skalabel dan mengintegrasikan inovasi IoT modern.
+NFCKey adalah sistem absensi IoT tingkat *enterprise* dan kontrol akses pintu yang dibangun menggunakan ESP32 + modul pembaca NFC/RFID (Prioritas NFC, dengan dukungan backup RFID), backend REST API Laravel, dan dashboard React. Proyek ini disusun sebagai Project Based Learning (PJBL) yang terstruktur sebagai sistem modular dunia nyata, memastikan skalabilitas yang tinggi dan integrasi inovasi IoT modern.
 
-## Cara Kerjanya
+---
 
-- Siswa melakukan tap kartu NFC (seperti smart tag, e-toll) atau kartu RFID sebagai cadangan pada perangkat di pintu.
-- ESP32 memvalidasi kartu, membuka kunci pintu, dan mencatat event absensi.
-- Reed switch melacak status pintu terbuka/tertutup dan mengunci kembali secara otomatis.
-- Perangkat bekerja secara **offline-first (dengan offline backup)**: data absensi tidak akan pernah hilang karena gangguan Wi-Fi/server. Data akan dicadangkan dengan aman secara lokal (via memori internal/SPIFFS/MicroSD), dan event yang antri akan disinkronkan secara otomatis (tanpa duplikasi) begitu konektivitas kembali.
-- Backend Laravel menjadi pusat data utama; dashboard React memberikan visibilitas kepada staf terkait absensi, kartu, siswa, dan status perangkat.
+## 🌟 Cara Kerjanya
 
-### 🚀 Fitur & Inovasi Utama
+1. **Tap untuk Masuk:** Pengguna menempelkan kartu NFC (seperti smart tag, e-Money) atau kartu RFID pada perangkat pembaca di pintu masuk.
+2. **Validasi Lokal:** Mikrokontroler ESP32 memvalidasi kartu secara instan, membuka kunci pintu (*solenoid lock*), dan mencatat event kehadiran.
+3. **Sensor Keamanan:** Sensor *reed switch* memantau status pintu (terbuka/tertutup). Sistem otomatis mengunci kembali pintu atau memicu alarm jika pintu ditahan terbuka terlalu lama.
+4. **Reliabilitas Offline-First:** Jika koneksi Wi-Fi terputus, data absensi **tidak akan hilang**. Semua rekaman dicadangkan secara aman pada penyimpanan lokal perangkat. Sinkronisasi *idempotent* akan berjalan secara otomatis saat jaringan kembali stabil.
+5. **Dashboard Sentral:** Backend Laravel mengelola basis data secara terpusat, sementara staf dan admin dapat memantau log akses, absensi harian, kartu aktif, serta status operasional alat melalui antarmuka web React.
 
-- **Portal Karyawan & Administrator**: Sistem login multi-role. Karyawan dapat memantau ringkasan absensi bulanannya (hadir, absen, dll) secara mandiri, sementara Administrator memiliki kontrol penuh (CRUD) atas seluruh data.
-- **Sistem Notifikasi Email & In-App**: Menggantikan notifikasi Telegram/WhatsApp dengan pengiriman Email otomatis dan peringatan di dalam Dashboard (In-App Bell) untuk menghindari ketergantungan pada aplikasi pihak ketiga.
-- **Smart Wi-Fi Captive Portal**: Tidak perlu hardcode kredensial Wi-Fi. Cukup hubungkan HP ke hotspot ESP32 untuk mengatur Wi-Fi secara dinamis melalui web interface.
-- **Anti-Passback & Cooldown**: Logika cerdas di backend untuk mencegah kecurangan "Titip Absen" dengan memberlakukan jeda waktu (cooldown) 5 menit untuk setiap kartu.
-- **Akses Berbasis Peran & Waktu**: Kontrol akses terperinci di mana kartu karyawan/shift pagi hanya berfungsi pada jam tertentu, sedangkan kartu admin memiliki akses 24/7.
-- **Alarm Pintu Terbuka (Door Ajar)**: Sensor mendeteksi jika pintu sengaja ditahan terbuka terlalu lama dan akan memicu alarm lokal serta peringatan.
-- **Pembaruan Over-The-Air (OTA)**: Pembaruan sistem (firmware) nirkabel secara langsung tanpa perlu mencolok kabel USB, meminimalkan pemeliharaan perangkat.
+---
 
-Full requirements: [`PROJECT_BRIEF.md`](./PROJECT_BRIEF.md).
-Build plan: [`docs/IMPLEMENTATION_PLAN.md`](./docs/IMPLEMENTATION_PLAN.md).
-MVP scope: [`docs/MVP.md`](./docs/MVP.md).
-RAB & Komponen: [`docs/RAB.md`](./docs/RAB.md).
+## 🚀 Fitur & Inovasi Utama
 
-## Repository structure
+- **Offline-First Synchronization:** Menjamin reliabilitas 100% tanpa adanya data absensi yang hilang akibat putusnya konektivitas internet atau server *downtime*.
+- **Portal Karyawan & Administrator:** Mendukung *multi-role login*. Admin memiliki kontrol penuh (CRUD), sedangkan anggota dapat memantau ringkasan kehadirannya secara mandiri.
+- **Sistem Notifikasi Email & In-App:** Laporan akses tidak wajar dikirimkan langsung melalui *Email* dan fitur *In-App Bell* tanpa bergantung pada layanan *messaging* pihak ketiga.
+- **Smart Wi-Fi Captive Portal (Rencana):** Koneksi Wi-Fi yang dinamis melalui *Captive Portal* sehingga konfigurasi jaringan dapat diubah menggunakan *smartphone* tanpa perlu menanamkan (*hardcode*) kredensial ke dalam sistem.
+- **Anti-Passback & Cooldown:** Logika *idempotent* yang secara cerdas mencegah penyalahgunaan "Titip Absen" dengan penolakan entri ganda (cooldown) dalam kurun waktu 5 menit per kartu.
+- **Akses Berbasis Peran & Waktu:** Kartu tamu / staf biasa hanya berfungsi pada jam kerja operasional, sedangkan admin memiliki hak akses 24/7.
+- **Pembaruan Over-The-Air (OTA) (Rencana):** Sistem pembaruan perangkat keras (*firmware*) yang bisa dilakukan dari jarak jauh tanpa kabel USB.
+
+---
+
+## 📂 Struktur Repositori
 
 ```text
-Proyek-5-PJBL/
-├── README.md
-├── PROJECT_BRIEF.md
+NFCKey/
+├── README.md                 ← Dokumentasi Utama
+├── PROJECT_BRIEF.md          ← Persyaratan Lengkap Proyek
 │
-├── docs/
-│   ├── IMPLEMENTATION_PLAN.md   ← start here
-│   ├── MVP.md
-│   ├── RAB.md
-│   ├── ARCHITECTURE.md
-│   ├── HARDWARE.md
-│   ├── FIRMWARE.md
-│   ├── API.md
-│   ├── DATABASE.md
-│   ├── TESTING.md
-│   ├── SECURITY.md
-│   └── DEPLOYMENT.md
+├── docs/                     ← Dokumentasi Teknis Sistem
+│   ├── PROPOSAL.md           ← Proposal PJBL Utama
+│   ├── IMPLEMENTATION_PLAN.md← Rencana & Checklist Progres
+│   ├── RAB.md                ← Rincian Anggaran Biaya
+│   ├── ARCHITECTURE.md       ← Desain Sistem & Arsitektur
+│   ├── HARDWARE.md           ← Skema Perangkat Keras
+│   ├── API.md                ← Kontrak Endpoint REST API
+│   └── ...                   
 │
-├── firmware/esp32/     ← ESP32 firmware (C/C++, Arduino/ESP-IDF)
-├── backend/laravel/    ← Laravel REST API
-├── frontend/react/     ← React + TypeScript dashboard
-└── hardware/
-    ├── wiring/
-    └── diagrams/
+├── firmware/esp32/           ← Source Code C/C++ ESP32 (PlatformIO)
+├── backend/laravel/          ← Source Code PHP Laravel REST API
+└── frontend/react/           ← Source Code React + TypeScript (Vite)
 ```
 
-## Status
+---
 
-Project scaffolded, not yet implemented. Follow the phases in
-[`docs/IMPLEMENTATION_PLAN.md`](./docs/IMPLEMENTATION_PLAN.md) in order: ESP32 bring-up → RFID →
-attendance model → door state machine → offline sync → backend → dashboard → integration.
+## 📈 Status Progres Pengembangan
 
-## Development principle
+Sistem ini sedang dalam masa pengembangan aktif, dengan fokus *Milestone* sebagai berikut:
 
-Reliability > Security > Correctness > Maintainability > UI polish. Build the MVP
-([`docs/MVP.md`](./docs/MVP.md)) first, verify each piece independently, then integrate.
+- 🟢 **Phase 1-5 (Firmware): Selesai** – Pembacaan NFC/RFID, sistem state mesin pintu (*door logic*), antrian *offline-first* (*Event Queue*), dan sinkronisasi selesai dibangun.
+- 🟢 **Phase 6 (Backend Laravel): Selesai** – API absensi terotomatisasi, perlindungan *idempotency* transaksi ganda, tabel *devices*, dsb telah siap digunakan.
+- 🟡 **Phase 7 (Frontend React): Sedang Berjalan** – Konteks autentikasi dan halaman *login* selesai dibangun. Penyusunan fitur *Dashboard* (*Students, Cards, Attendance*) sedang diimplementasikan.
+- ⚪ **Phase 8 (Integration): Menunggu** – Integrasi sistem secara menyeluruh dan pengujian skala penuh (E2E Testing).
+
+Ikuti detail pembangunannya di [`docs/IMPLEMENTATION_PLAN.md`](./docs/IMPLEMENTATION_PLAN.md).
+
+---
+
+## ⚙️ Prinsip Pengembangan
+
+**Reliabilitas > Keamanan > Kebenaran Fungsi > Skalabilitas > Tampilan UI.**
+
+Fokus utama adalah membangun Produk Layak Jual minimum (MVP) berdasarkan [`docs/MVP.md`](./docs/MVP.md) terlebih dahulu, memverifikasi seluruh komunikasi perangkat secara independen, barulah memoles antarmuka pengguna ke tahap maksimal.
