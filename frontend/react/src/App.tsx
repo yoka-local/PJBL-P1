@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { LayoutDashboard, Users as UsersIcon, CreditCard, Activity, Settings, Bell, Search, ShieldCheck, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users as UsersIcon, CreditCard, Activity, Settings, Bell, Search, ShieldCheck, LogOut, Smartphone } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Logs from './components/Logs';
 import Users from './components/Users';
 import Cards from './components/Cards';
 import SettingsView from './components/Settings';
+import Devices from './components/Devices';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
       case 'logs': return <Logs />;
       case 'users': return <Users />;
       case 'cards': return <Cards />;
+      case 'devices': return <Devices />;
       case 'settings': return <SettingsView />;
       default: return <Dashboard />;
     }
@@ -80,6 +82,7 @@ function App() {
             <>
               <NavItem icon={<UsersIcon />} label="Data Pengguna" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
               <NavItem icon={<CreditCard />} label="Kartu Akses" active={activeTab === 'cards'} onClick={() => setActiveTab('cards')} />
+              <NavItem icon={<Smartphone />} label="Perangkat" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
               <NavItem icon={<Settings />} label="Pengaturan" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
             </>
           )}
