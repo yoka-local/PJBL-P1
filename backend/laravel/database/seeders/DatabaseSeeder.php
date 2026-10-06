@@ -18,8 +18,9 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test Admin',
-            'email' => 'admin@pjbl.com',
+            'name' => 'Admin User',
+            'email' => 'gopyl@proton.me',
+            'password' => \Illuminate\Support\Facades\Hash::make('yorushika'),
             'role' => 'admin'
         ]);
     }
