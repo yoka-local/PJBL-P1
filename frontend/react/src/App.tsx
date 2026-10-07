@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutDashboard, Users as UsersIcon, CreditCard, Activity, Settings, Bell, Search, ShieldCheck, LogOut, Smartphone } from 'lucide-react';
+import { LayoutDashboard, Users as UsersIcon, CreditCard, Activity, Settings, Bell, ShieldCheck, Smartphone, Book } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Logs from './components/Logs';
 import Users from './components/Users';
@@ -26,28 +26,28 @@ function App() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">Loading...</div>;
+    return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] text-[#57606a]">Loading...</div>;
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="bg-white p-8 rounded-xl shadow-md w-96">
-          <div className="flex items-center gap-3 justify-center text-primary mb-8">
-            <ShieldCheck className="w-10 h-10" />
-            <h1 className="text-2xl font-bold tracking-wider text-slate-800">NFCKey</h1>
-          </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f8fa]">
+        <div className="mb-6 flex flex-col items-center gap-4">
+          <ShieldCheck className="w-12 h-12 text-[#24292f]" />
+          <h1 className="text-2xl tracking-tight text-[#24292f]">Sign in to NFCKey</h1>
+        </div>
+        <div className="bg-[#ffffff] p-6 rounded-md shadow-sm border border-[#d0d7de] w-80">
           <form onSubmit={handleLogin} className="space-y-4">
-            {loginError && <div className="text-red-500 text-sm p-2 bg-red-50 rounded">{loginError}</div>}
+            {loginError && <div className="text-[#cf222e] text-sm p-3 bg-[#FFEBE9] border border-[#ff818266] rounded-md">{loginError}</div>}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none" />
+              <label className="block text-sm font-medium text-[#24292f] mb-1">Email address</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md focus:ring-2 focus:ring-[#0969da] focus:border-[#0969da] outline-none bg-[#f6f8fa] focus:bg-[#ffffff] text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none" />
+              <label className="block text-sm font-medium text-[#24292f] mb-1">Password</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md focus:ring-2 focus:ring-[#0969da] focus:border-[#0969da] outline-none bg-[#f6f8fa] focus:bg-[#ffffff] text-sm" />
             </div>
-            <button type="submit" className="w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary/90 transition">Login</button>
+            <button type="submit" className="w-full bg-[#2da44e] text-white py-1.5 rounded-md text-sm font-medium border border-[#2da44e] hover:bg-[#2c974b] transition">Sign in</button>
           </form>
         </div>
       </div>
@@ -67,63 +67,91 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col">
-        <div className="p-6 flex items-center gap-3 text-white border-b border-slate-800">
-          <ShieldCheck className="w-8 h-8 text-primary" />
-          <h1 className="text-xl font-bold tracking-wider">NFCKey</h1>
+    <div className="min-h-screen bg-[#ffffff] flex flex-col font-[-apple-system,BlinkMacSystemFont,Segoe_UI,Helvetica,Arial,sans-serif]">
+      {/* Global Header (Dark) */}
+      <header className="h-16 bg-[#24292f] flex items-center justify-between px-6 flex-shrink-0 text-white">
+        <div className="flex items-center gap-4">
+          <ShieldCheck className="w-8 h-8 text-white" />
+          
+          <div className="relative w-64 ml-4">
+            <input 
+              type="text" 
+              placeholder="Search or jump to..." 
+              className="w-full pl-3 pr-3 py-1 bg-[#24292f] border border-[#57606a] rounded-md text-sm text-white focus:bg-white focus:text-[#24292f] focus:w-80 transition-all outline-none placeholder:text-[#8c959f]"
+            />
+          </div>
+
+          <nav className="hidden md:flex items-center gap-4 text-sm font-semibold text-white ml-2">
+            <a href="#" className="hover:text-[#c6cbd1]">Pull requests</a>
+            <a href="#" className="hover:text-[#c6cbd1]">Issues</a>
+            <a href="#" className="hover:text-[#c6cbd1]">Marketplace</a>
+            <a href="#" className="hover:text-[#c6cbd1]">Explore</a>
+          </nav>
         </div>
         
-        <nav className="flex-1 px-4 py-6 space-y-2">
-          <NavItem icon={<LayoutDashboard />} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-          <NavItem icon={<Activity />} label="Log Absensi" active={activeTab === 'logs'} onClick={() => setActiveTab('logs')} />
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Bell className="w-4 h-4 text-white cursor-pointer hover:text-[#c6cbd1] transition-colors" />
+          </div>
+          <div className="flex items-center gap-2 cursor-pointer relative group">
+            <div className="w-5 h-5 bg-[#ffffff] rounded-full flex items-center justify-center text-[#24292f] font-bold text-xs overflow-hidden">
+               <img src={`https://avatars.githubusercontent.com/u/1?v=4`} alt="Avatar" className="w-full h-full object-cover" />
+            </div>
+            <span className="text-sm font-medium">▼</span>
+            
+            {/* Dropdown for logout */}
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg border border-[#d0d7de] hidden group-hover:block z-50">
+               <div className="px-4 py-2 border-b border-[#d0d7de] text-sm text-[#24292f]">
+                 Signed in as <br /> <strong className="font-semibold">{user.name}</strong>
+               </div>
+               <button onClick={logout} className="w-full text-left px-4 py-2 text-sm text-[#24292f] hover:bg-[#0969da] hover:text-white transition-colors">
+                 Sign out
+               </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Repository Header area (Light) */}
+      <div className="bg-[#f6f8fa] pt-4 border-b border-[#d0d7de]">
+        <div className="px-6 pb-4 flex items-center gap-2 text-xl">
+           <Book className="w-5 h-5 text-[#57606a]" />
+           <span className="text-[#0969da] font-semibold cursor-pointer hover:underline">nfckey</span>
+           <span className="text-[#57606a]">/</span>
+           <span className="text-[#0969da] font-semibold cursor-pointer hover:underline">dashboard</span>
+           <span className="px-2 py-0.5 border border-[#d0d7de] rounded-full text-xs text-[#57606a] font-medium ml-2">Public</span>
+        </div>
+
+        {/* Navigation Tabs */}
+        <nav className="flex items-center gap-2 px-6 overflow-x-auto">
+          <TabItem icon={<LayoutDashboard className="w-4 h-4" />} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <TabItem icon={<Activity className="w-4 h-4" />} label="Logs" active={activeTab === 'logs'} onClick={() => setActiveTab('logs')} />
           {user.role === 'admin' && (
             <>
-              <NavItem icon={<UsersIcon />} label="Data Pengguna" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
-              <NavItem icon={<CreditCard />} label="Kartu Akses" active={activeTab === 'cards'} onClick={() => setActiveTab('cards')} />
-              <NavItem icon={<Smartphone />} label="Perangkat" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
-              <NavItem icon={<Settings />} label="Pengaturan" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+              <TabItem icon={<UsersIcon className="w-4 h-4" />} label="Users" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
+              <TabItem icon={<CreditCard className="w-4 h-4" />} label="Cards" active={activeTab === 'cards'} onClick={() => setActiveTab('cards')} />
+              <TabItem icon={<Smartphone className="w-4 h-4" />} label="Devices" active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} />
+              <TabItem icon={<Settings className="w-4 h-4" />} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
             </>
           )}
         </nav>
-      </aside>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 flex-shrink-0">
-          <div className="relative w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input 
-              type="text" 
-              placeholder="Cari nama atau nomor kartu..." 
-              className="w-full pl-10 pr-4 py-2 bg-slate-100 border-transparent rounded-lg focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
-            />
+      <main className="flex-1 max-w-[1280px] w-full mx-auto p-6">
+        <div className="border border-[#d0d7de] rounded-md overflow-hidden bg-white">
+          <div className="bg-[#f6f8fa] border-b border-[#d0d7de] px-4 py-3 flex items-center justify-between text-sm text-[#57606a] font-semibold">
+             <div className="flex items-center gap-2">
+                <img src={`https://avatars.githubusercontent.com/u/1?v=4`} alt="Avatar" className="w-5 h-5 rounded-full" />
+                <span className="font-bold text-[#24292f]">{user.name}</span> updated the active view
+             </div>
+             <div>
+                <span className="font-normal text-[#57606a]">Just now</span>
+             </div>
           </div>
-          
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <Bell className="w-6 h-6 text-slate-600 cursor-pointer hover:text-primary transition-colors" />
-            </div>
-            <div className="flex items-center gap-3 pl-6 border-l border-slate-200">
-              <div className="text-right">
-                <p className="text-sm font-semibold text-slate-700">{user.name}</p>
-                <p className="text-xs text-slate-500 capitalize">{user.role}</p>
-              </div>
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-              <button onClick={logout} className="ml-4 text-slate-400 hover:text-red-500 transition" title="Logout">
-                <LogOut className="w-5 h-5" />
-              </button>
-            </div>
+          <div className="p-6">
+            {renderContent()}
           </div>
-        </header>
-
-        {/* Dynamic Content */}
-        <div className="flex-1 p-8 overflow-y-auto">
-          {renderContent()}
         </div>
       </main>
     </div>
@@ -131,14 +159,14 @@ function App() {
 }
 
 // Components
-function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick: () => void }) {
+function TabItem({ icon, label, active, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick: () => void }) {
   return (
     <button 
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium ${
+      className={`flex items-center gap-2 px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
         active 
-          ? 'bg-primary text-white' 
-          : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+          ? 'border-[#fd8c73] text-[#24292f] font-semibold' 
+          : 'border-transparent text-[#57606a] hover:bg-[#d0d7de33] hover:text-[#24292f] rounded-t-md'
       }`}
     >
       {icon}
