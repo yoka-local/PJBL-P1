@@ -2,7 +2,7 @@
 
 ## Project
 
-**NEXUSGATE: SISTEM ABSENSI & KONTROL AKSES PINTAR (NFC)**
+**NFCKEY: SISTEM ABSENSI & KONTROL AKSES PINTAR (NFC)**
 
 **Subtitle:** Sistem Absensi dan Kontrol Akses Pintu Inovatif Berbasis ESP32
 
