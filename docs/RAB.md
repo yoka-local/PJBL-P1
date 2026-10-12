@@ -5,11 +5,11 @@ Berikut adalah estimasi Rencana Anggaran Biaya (RAB) untuk pembuatan prototipe *
 | No | Nama Komponen | Spesifikasi / Keterangan | Estimasi Harga (Rp) | Check List |
 |---|---|---|---|---|
 | 1 | ESP32 Development Board | NodeMCU WROOM-32 (Disediakan oleh sekolah) | 45.000 - 50.000 | [x] |
-| 2 | Modul NFC RFID PN532 V3 | Membaca kartu NFC (e-Money, smart tag) & RFID | 55.000 - 65.000 | [ ] | 
-| 3 | Mini Solenoid Door Lock | **Versi 12V** (Lebih kuat dan stabil) | 35.000 - 45.000 | [ ] |
-| 4 | Adaptor 12V 2A | Catu daya utama untuk Solenoid 12V | 25.000 - 35.000 | [ ] |
-| 5 | Step-Down Module LM2596 | Menurunkan 12V ke 5V untuk power ESP32 (Satu colokan) | 12.000 - 15.000 | [ ] |
-| 6 | Relay Module 1 Channel | 5V DC (Untuk mengontrol arus 12V ke solenoid) | 6.000 - 8.000 | [ ] |
+| 2 | Modul NFC RFID PN532 V3 | Membaca kartu NFC (e-Money, smart tag) & RFID | 55.000 - 65.000 | [x] | 
+| 3 | Mini Solenoid Door Lock | **Versi 12V** (Lebih kuat dan stabil) | 35.000 - 45.000 | [x] |
+| 4 | Adaptor 12V 2A | Catu daya utama untuk Solenoid 12V | 25.000 - 35.000 | [x] |
+| 5 | Step-Down Module LM2596 | Menurunkan 12V ke 5V untuk power ESP32 (Satu colokan) | 12.000 - 15.000 | [x] |
+| 6 | Relay Module 1 Channel | 5V DC (Untuk mengontrol arus 12V ke solenoid) | 6.000 - 8.000 | [x] |
 | 7 | Jack DC Female 5.5x2.1mm | Soket untuk mencolok adaptor 12V ke rangkaian | 2.000 - 3.000 | [ ] |
 | 8 | Magnetic Reed Switch (MC-38) | Sensor magnet pendeteksi status pintu (Buka/Tutup)| 8.000 - 12.000 | [ ] |
 | 9 | Active Buzzer | 5V DC (Indikator audio/alarm) | 2.000 - 3.000 | [ ] |
