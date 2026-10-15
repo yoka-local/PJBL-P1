@@ -1,16 +1,12 @@
 # 🛠️ Identifikasi Alat & Spesifikasi Teknis Hardware (Hardware & Technical Specifications)
 
-Dokumen ini memuat identifikasi menyeluruh, parameter arsitektur mikrokontroler (*dual-core*, alokasi memori, partisi flash), dokumentasi visual foto asli dari sumber terverifikasi (*non-generated*), dan spesifikasi teknis mendalam dari seluruh komponen, modul, catu daya, dan perkakas pada proyek **NFCKey (Smart NFC Attendance & Door Access System)**.
+Dokumen ini memuat identifikasi menyeluruh, parameter arsitektur mikrokontroler (*dual-core*, alokasi memori, partisi flash), dan spesifikasi teknis mendalam dari seluruh komponen, modul, catu daya, dan perkakas pada proyek **NFCKey (Smart NFC Attendance & Door Access System)**.
 
 ---
 
 ## 🧠 1. Komputasi & Pemrosesan Inti (Core Controller & Architecture)
 
 ### 1. ESP32 DevKit V1 / NodeMCU (WROOM-32)
-
-![ESP32 Dev Board](https://upload.wikimedia.org/wikipedia/commons/c/c2/ESP32_Dev_Board.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:ESP32_Dev_Board.jpg](https://commons.wikimedia.org/wiki/File:ESP32_Dev_Board.jpg)
-
 * **Peran:** *"The Brain of the Project"* (Otak dan Pusat Kendali Sistem)
 * **Arsitektur Pemroses (CPU):**
   * **Processor:** Dual-Core 32-bit Xtensa LX6 Microprocessor.
@@ -38,23 +34,9 @@ Dokumen ini memuat identifikasi menyeluruh, parameter arsitektur mikrokontroler 
 
 ---
 
-### 2. Kabel Data Micro-USB
-
-![Micro-USB Plug](https://upload.wikimedia.org/wikipedia/commons/d/db/MicroB_USB_Plug.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:MicroB_USB_Plug.jpg](https://commons.wikimedia.org/wiki/File:MicroB_USB_Plug.jpg)
-
-* **Peran:** *"The Neural Link / Flashing & Telemetry Cable"*
-* **Fungsi:** Mengalirkan data pemrograman (flashing via PlatformIO) dan telemetri serial debugging (baudrate 115200) antara komputer dan chip USB-to-UART (CP2102/CH340) pada ESP32.
-
----
-
 ## 📡 2. Sensor & Identifikasi Masukan (Inputs & Sensing)
 
-### 3. Modul Pembaca NFC/RFID (PN532 V3 / RC522)
-
-![RFID RC522 Reader Module](https://upload.wikimedia.org/wikipedia/commons/b/b0/RFID-RC522.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:RFID-RC522.jpg](https://commons.wikimedia.org/wiki/File:RFID-RC522.jpg)
-
+### 2. Modul Pembaca NFC/RFID (PN532 V3 / RC522)
 * **Peran:** *"The Scanner / The Eyes"* (Sensor Pengenal Identitas)
 * **Spesifikasi Teknis:**
   * **Frekuensi Kerja:** **13.56 MHz** (High Frequency / HF RFID).
@@ -67,26 +49,7 @@ Dokumen ini memuat identifikasi menyeluruh, parameter arsitektur mikrokontroler 
   * **Jarak Deteksi Operasional:** 0 hingga 5 cm (tergantung geometri antena dan penghalang fisik).
   * **Tegangan Kerja:** **3.3V DC** (Dihubungkan ke pin 3V3 ESP32; modul tidak boleh diberi 5V pada jalur VCC).
 
----
-
-### 4. Kartu & Gantungan Kunci NFC/RFID (Cards & Keyfobs)
-
-![RFID Card & Tag](https://upload.wikimedia.org/wikipedia/commons/1/17/RFID_card.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:RFID_card.jpg](https://commons.wikimedia.org/wiki/File:RFID_card.jpg)
-
-* **Peran:** *"The Digital Keys / Badges"* (Kunci Digital Siswa)
-* **Spesifikasi Teknis:**
-  * **Chipset:** NXP Mifare Classic 1K / NTAG213 berfrekuensi 13.56 MHz dengan kumparan antena internal (*loop antenna*).
-  * **Format UID:** 4-Byte Hex (contoh: `04:A3:92:7F`) atau 7-Byte Hex (contoh: `04:8F:12:34:56:78:9A`).
-  * **Sifat Transmisi:** Pasif (*passive transponder*) — mendapat daya dari medan elektromagnetik antena reader saat didekatkan.
-
----
-
-### 5. Magnetic Reed Switch (MC-38)
-
-![Reed Switch](https://upload.wikimedia.org/wikipedia/commons/b/bd/Reed_switch_%28aka%29.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:Reed_switch_(aka).jpg](https://commons.wikimedia.org/wiki/File:Reed_switch_%28aka%29.jpg)
-
+### 3. Magnetic Reed Switch (MC-38)
 * **Peran:** *"The Door Senses"* (Indra Status Posisi Pintu)
 * **Spesifikasi Teknis:**
   * **Tipe Sakelar:** Kontak Magnetik Pasif tipe *Normally Closed (NC)* (saat magnet menempel/pintu tertutup, kontak terhubung ke GND; saat magnet menjauh/pintu terbuka, kontak terputus).
@@ -98,11 +61,7 @@ Dokumen ini memuat identifikasi menyeluruh, parameter arsitektur mikrokontroler 
 
 ## ⚡ 3. Aktuator, Pengaman & Indikator (Outputs & Feedback)
 
-### 6. Mini Solenoid Door Lock 12V
-
-![Solenoid Door Lock Setup](https://upload.wikimedia.org/wikipedia/commons/9/9a/Solenoid_lock_setup.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:Solenoid_lock_setup.jpg](https://commons.wikimedia.org/wiki/File:Solenoid_lock_setup.jpg)
-
+### 4. Mini Solenoid Door Lock 12V
 * **Peran:** *"The Muscle / The Physical Deadbolt"* (Lidah Pengunci Mekanis)
 * **Spesifikasi Teknis:**
   * **Mode Keamanan:** **Fail-Secure (Normally Closed)** — Pintu tetap terkunci rapat saat tidak ada listrik untuk menjaga keamanan ruangan.
@@ -111,55 +70,28 @@ Dokumen ini memuat identifikasi menyeluruh, parameter arsitektur mikrokontroler 
   * **Panjang Langkah Lidah Kunci (Stroke):** 10 mm.
   * **Batas Durasi Aktif (Duty Cycle):** Maksimum 10 detik kontinu (untuk mencegah kumparan koil mengalami *overheating*).
 
----
-
-### 7. Modul Relay 1-Channel 5V (Songle SRD-05VDC-SL-C)
-
-![1-Channel 5V Relay Module](https://upload.wikimedia.org/wikipedia/commons/5/56/SRD-05VDC-SL-C_5V_one-channel_relay_module.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:SRD-05VDC-SL-C_5V_one-channel_relay_module.jpg](https://commons.wikimedia.org/wiki/File:SRD-05VDC-SL-C_5V_one-channel_relay_module.jpg)
-
+### 5. Modul Relay 1-Channel 5V
 * **Peran:** *"The Heavy Switch / Electrical Gatekeeper"* (Sakelar Elektrik Pengaman)
 * **Spesifikasi Teknis:**
   * **Tegangan Koil Pemicu:** 5V DC (Pin VCC terhubung ke output 5V LM2596, pin IN terhubung ke GPIO 26).
   * **Kapasitas Kontak Relay:** 10A 250VAC / 10A 30VDC.
   * **Isolasi Optik:** Menggunakan optocoupler (PC817) untuk mengisolasi noise elektrik induktif solenoid dari ESP32.
 
----
-
-### 8. Dioda Flyback 1N4007
-
-![Diode 1N4007](https://upload.wikimedia.org/wikipedia/commons/9/92/Diode_1N4007.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:Diode_1N4007.jpg](https://commons.wikimedia.org/wiki/File:Diode_1N4007.jpg)
-
+### 6. Dioda Flyback 1N4007
 * **Peran:** *"The Circuit Shield"* (Peredam Lonjakan Tegangan Induktif)
 * **Spesifikasi Teknis:**
   * **Peak Reverse Voltage ($V_{RRM}$):** 1000V.
   * **Arus Terusan Rata-rata ($I_{F}$):** 1.0A.
   * **Pemasangan:** Paralel terbalik (*reverse biased*) pada terminal positif dan negatif solenoid untuk menyerap lonjakan *back-EMF kickback*.
 
----
-
-### 9. Active Buzzer 5V
-
-![Active Piezoelectric Buzzer](https://upload.wikimedia.org/wikipedia/commons/d/d3/2007-07-24_Piezoelectric_buzzer.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:2007-07-24_Piezoelectric_buzzer.jpg](https://commons.wikimedia.org/wiki/File:2007-07-24_Piezoelectric_buzzer.jpg)
-
+### 7. Active Buzzer 5V
 * **Peran:** *"The Voice / Alarm Siren"* (Indikator Audio & Sirine)
 * **Spesifikasi Teknis:**
   * **Tegangan Operasional:** 3.5V – 5.5V DC (Dikontrol langsung via GPIO 14).
   * **Frekuensi Resonansi:** $\approx 2300\text{ Hz} \pm 300\text{ Hz}$ (Menghasilkan nada bip nyaring dengan suplai tegangan DC tanpa memerlukan generator PWM kompleks).
   * **Tingkat Tekanan Suara (SPL):** $\ge 85\text{ dB}$ pada jarak 10 cm.
 
----
-
-### 10. LED Indikator 5mm & Resistor Pembatas Arus
-
-![5mm LED](https://upload.wikimedia.org/wikipedia/commons/f/f9/LED%2C_5mm%2C_green_%28en%29.svg)  
-> 🔗 **Tautan Sumber Gambar LED:** [Wikimedia Commons - File:LED,_5mm,_green_(en).svg](https://commons.wikimedia.org/wiki/File:LED,_5mm,_green_(en).svg)
-
-![Resistor 220 Ohm](https://upload.wikimedia.org/wikipedia/commons/e/e6/Resistor.jpg)  
-> 🔗 **Tautan Sumber Gambar Resistor:** [Wikimedia Commons - File:Resistor.jpg](https://commons.wikimedia.org/wiki/File:Resistor.jpg)
-
+### 8. LED Indikator 5mm & Resistor Pembatas Arus
 * **LED Hijau, Merah, Kuning (5mm Diffused):**
   * LED Hijau (GPIO 32, $V_f \approx 2.1\text{V}$) $\rightarrow$ Status Akses Diterima.
   * LED Merah (GPIO 33, $V_f \approx 1.9\text{V}$) $\rightarrow$ Status Akses Ditolak & Alarm Pembobolan.
@@ -171,22 +103,12 @@ Dokumen ini memuat identifikasi menyeluruh, parameter arsitektur mikrokontroler 
 
 ## 🔌 4. Sistem Catu Daya & Regulasi Tegangan
 
-### 11. Adaptor DC 12V 2A
-
-![AC to DC Power Adapter](https://upload.wikimedia.org/wikipedia/commons/e/e4/Ac_adapter.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:Ac_adapter.jpg](https://commons.wikimedia.org/wiki/File:Ac_adapter.jpg)
-
+### 9. Adaptor DC 12V 2A
 * **Input:** AC 100–240V, 50/60 Hz.
 * **Output:** DC 12V $\pm 5\%$, arus maksimum 2.0A (Daya total 24 Watt).
 * **Konektor:** DC Barrel Jack standar 5.5 x 2.1 mm (Center Positive).
 
----
-
-### 12. Modul Step-Down Buck Converter (LM2596)
-
-![LM2596 Buck Converter Module](https://upload.wikimedia.org/wikipedia/commons/6/66/LM2596_buck_converter_module%2C_MP1584_buck_converter_module%2C_and_SDB628_boost_converter_module.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:LM2596_buck_converter_module.jpg](https://commons.wikimedia.org/wiki/File:LM2596_buck_converter_module,_MP1584_buck_converter_module,_and_SDB628_boost_converter_module.jpg)
-
+### 10. Modul Step-Down Buck Converter (LM2596)
 * **Tegangan Input:** DC 4.5V – 40V (Dihubungkan ke output Adaptor 12V).
 * **Tegangan Output:** Diatur presisi menggunakan trimpot multi-turn pada **5.0V DC $\pm 0.05\text{V}$**.
 * **Arus Output:** 2A kontinu (maksimum 3A dengan pendingin).
@@ -197,27 +119,8 @@ Dokumen ini memuat identifikasi menyeluruh, parameter arsitektur mikrokontroler 
 
 ## 🧰 5. Prototyping & Perkakas Perakitan
 
-### 13. Breadboard Half-Size (400 Tie-Points)
-
-![Breadboard](https://upload.wikimedia.org/wikipedia/commons/e/e8/Breadboard.png)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:Breadboard.png](https://commons.wikimedia.org/wiki/File:Breadboard.png)
-
-* **Fungsi:** Papan sirkuit prototyping solderless untuk menguji interkoneksi modul dan kabel sebelum pemasangan permanen.
-
----
-
-### 14. Kabel Jumper Dupont (Male-Female, Female-Female, Male-Male)
-
-![Jumper Wires](https://upload.wikimedia.org/wikipedia/commons/3/3b/Jumper_wire.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:Jumper_wire.jpg](https://commons.wikimedia.org/wiki/File:Jumper_wire.jpg)
-
-* **Fungsi:** Menghubungkan pin header antar modul elektronik (ESP32, RC522, Relay, Sensor Reed Switch, LED, dan Buzzer).
-
----
-
-### 15. Multimeter Digital (Avometer)
-
-![Digital Multimeter](https://upload.wikimedia.org/wikipedia/commons/9/9a/Digital_Multimeter.jpg)  
-> 🔗 **Tautan Sumber Gambar:** [Wikimedia Commons - File:Digital_Multimeter.jpg](https://commons.wikimedia.org/wiki/File:Digital_Multimeter.jpg)
-
-* **Fungsi:** Alat ukur wajib untuk mengkalibrasi tegangan output Step-Down LM2596 tepat pada **5.0V** sebelum disambungkan ke ESP32 guna mencegah kerusakan overvoltage.
+1. **Breadboard Half-Size (400 Tie-Points):** Papan rangkaian tanpa solder dengan bus tegangan terpisah.
+2. **Kabel Jumper Dupont (40 pcs):** Jalur penghubung Female-Female, Male-Female, dan Male-Male.
+3. **Multimeter Digital (Avometer):** Alat ukur wajib untuk memverifikasi tegangan output LM2596 tepat di 5.0V sebelum disambungkan ke pin VIN ESP32 guna mencegah kerusakan akibat *overvoltage*.
+4. **Obeng Presisi:** Untuk menyetel trimpot tegangan LM2596 dan mengencangkan terminal sekrup Jack DC serta Relay.
+5. **Kotak Enclosure & Double Tape Foam 3M:** Rumah pelindung rangkaian di sisi dalam pintu ruangan.
