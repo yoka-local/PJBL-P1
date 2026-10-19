@@ -149,7 +149,7 @@ export default function Users() {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>

@@ -174,7 +174,7 @@ export default function Cards() {
               </div>
             </div>
           </div>
-        ))}
+        )))}
       </div>
 
       {/* Modal Daftarkan Kartu */}

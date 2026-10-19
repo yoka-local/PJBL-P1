@@ -170,7 +170,7 @@ export default function Devices() {
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* Modal Tambah Device */}
