@@ -5,8 +5,8 @@
 // 1. PENGATURAN WI-FI & KREDENSIAL SUPABASE
 // ============================================================================
 // Ganti dengan nama WiFi / Hotspot HP Anda untuk pengujian nyata:
-#define WIFI_SSID     "NAMA_WIFI_ANDA"
-#define WIFI_PASSWORD "PASSWORD_WIFI_ANDA"
+#define WIFI_SSID     "PJBLSimulation"
+#define WIFI_PASSWORD "Yorushika"
 
 #define DEVICE_ID     "GATE-01"
 #define SUPABASE_URL  "https://zdsmcifmlbwejyihorqs.supabase.co"

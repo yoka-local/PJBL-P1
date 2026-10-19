@@ -34,8 +34,8 @@
 #define TIMEOUT_DOOR_OPEN_MS        30000
 
 // Wi-Fi (Use "Wokwi-GUEST" with empty password for Wokwi simulation)
-#define WIFI_SSID "Wokwi-GUEST"
-#define WIFI_PASSWORD ""
+#define WIFI_SSID "PJBLSimulation"
+#define WIFI_PASSWORD "Yorushika"
 #define WIFI_RETRY_INTERVAL_MS 5000
 
 // Supabase Direct REST API Settings
