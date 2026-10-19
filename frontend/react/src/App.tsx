@@ -42,9 +42,12 @@ function App() {
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f8fa]">
-        <div className="mb-6 flex flex-col items-center gap-4">
+        <div className="mb-6 flex flex-col items-center gap-2">
           <ShieldCheck className="w-12 h-12 text-[#24292f]" />
           <h1 className="text-2xl tracking-tight text-[#24292f]">Sign in to NFCKey</h1>
+          <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#dafbe1] text-[#1a7f37] font-semibold border border-[#4ac26b66]">
+            v2.0 (Supabase Live)
+          </span>
         </div>
         <div className="bg-[#ffffff] p-6 rounded-md shadow-sm border border-[#d0d7de] w-80">
           <form onSubmit={handleLogin} className="space-y-4">
