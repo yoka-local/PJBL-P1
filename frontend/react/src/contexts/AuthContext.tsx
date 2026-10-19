@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { supabase } from '../supabase';
 
-interface User {
+export interface User {
   id: number | string;
   name: string;
   email: string;
@@ -10,10 +10,22 @@ interface User {
   department?: string;
 }
 
+export interface RememberedUser {
+  id: number | string;
+  name: string;
+  email: string;
+  role: 'admin' | 'worker';
+  department?: string;
+  savedAt: string;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (credentials: any) => Promise<void>;
+  quickLogin: () => Promise<void>;
+  forgetRememberedUser: () => void;
+  rememberedUser: RememberedUser | null;
   logout: () => void;
 }
 
@@ -22,6 +34,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rememberedUser, setRememberedUser] = useState<RememberedUser | null>(() => {
+    try {
+      const stored = localStorage.getItem('nfckey_remembered_user');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     checkAuth();
@@ -72,6 +92,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const email = (credentials.email || '').trim().toLowerCase();
     const password = (credentials.password || '').trim();
 
+    const saveRemembered = (u: User) => {
+      try {
+        const item: RememberedUser = {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          department: u.department,
+          savedAt: new Date().toISOString(),
+        };
+        localStorage.setItem('nfckey_remembered_user', JSON.stringify(item));
+        setRememberedUser(item);
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    // 1. Try Supabase Auth
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -79,13 +117,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (!error && data?.user) {
-        setUser({
+        const authUser: User = {
           id: data.user.id,
           name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Administrator',
           email: data.user.email || email,
           role: (data.user.user_metadata?.role as any) || 'admin',
           department: data.user.user_metadata?.department || 'IT Operations',
-        });
+        };
+        saveRemembered(authUser);
+        setUser(authUser);
         return;
       }
     } catch (supabaseErr) {
@@ -111,6 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             department: dbUser.department || 'IT Operations',
           };
           localStorage.setItem('demo_auth', JSON.stringify(authUser));
+          saveRemembered(authUser);
           setUser(authUser);
           return;
         }
@@ -136,11 +177,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         department: 'Sistem Keamanan & Presensi',
       };
       localStorage.setItem('demo_auth', JSON.stringify(demoUser));
+      saveRemembered(demoUser);
       setUser(demoUser);
       return;
     }
 
-    throw new Error('Email atau password tidak sesuai. Gunakan gopyl@proton.me / yorushika');
+    throw new Error('Email atau password tidak sesuai.');
+  };
+
+  const quickLogin = async () => {
+    if (!rememberedUser) {
+      throw new Error('Tidak ada akun tersimpan di browser ini.');
+    }
+    const authUser: User = {
+      id: rememberedUser.id,
+      name: rememberedUser.name,
+      email: rememberedUser.email,
+      role: rememberedUser.role,
+      department: rememberedUser.department,
+    };
+    localStorage.setItem('demo_auth', JSON.stringify(authUser));
+    setUser(authUser);
+  };
+
+  const forgetRememberedUser = () => {
+    try {
+      localStorage.removeItem('nfckey_remembered_user');
+    } catch (e) {
+      // ignore
+    }
+    setRememberedUser(null);
   };
 
   const logout = async () => {
@@ -155,7 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, quickLogin, forgetRememberedUser, rememberedUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

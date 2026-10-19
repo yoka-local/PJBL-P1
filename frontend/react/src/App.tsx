@@ -10,7 +10,7 @@ import { useAuth } from './contexts/AuthContext';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { user, loading, login, logout } = useAuth();
+  const { user, loading, login, logout, rememberedUser, quickLogin, forgetRememberedUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -25,54 +25,95 @@ function App() {
     }
   };
 
-  const handleQuickDemo = async () => {
-    setEmail('gopyl@proton.me');
-    setPassword('yorushika');
-    try {
-      await login({ email: 'gopyl@proton.me', password: 'yorushika' });
-    } catch (err: any) {
-      setLoginError(err.message || 'Login failed');
-    }
-  };
-
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] text-[#57606a]">Loading...</div>;
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f8fa]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f8fa] px-4">
         <div className="mb-6 flex flex-col items-center gap-2">
           <ShieldCheck className="w-12 h-12 text-[#24292f]" />
-          <h1 className="text-2xl tracking-tight text-[#24292f]">Sign in to NFCKey</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#24292f]">Sign in to NFCKey</h1>
           <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#dafbe1] text-[#1a7f37] font-semibold border border-[#4ac26b66]">
             v2.0 (Supabase Live)
           </span>
         </div>
-        <div className="bg-[#ffffff] p-6 rounded-md shadow-sm border border-[#d0d7de] w-80">
+        <div className="bg-[#ffffff] p-6 rounded-md shadow-sm border border-[#d0d7de] w-full max-w-sm">
+          {/* Only visible if a user previously logged in on this browser */}
+          {rememberedUser && (
+            <div className="mb-4 p-3 bg-[#f6f8fa] border border-[#d0d7de] rounded-md">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-semibold text-[#57606a] uppercase tracking-wider">
+                  Saved on this device
+                </span>
+                <button
+                  type="button"
+                  onClick={forgetRememberedUser}
+                  className="text-xs text-[#cf222e] hover:underline"
+                >
+                  Forget
+                </button>
+              </div>
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <div className="w-8 h-8 rounded-full bg-[#0969da] text-white flex items-center justify-center font-bold text-xs">
+                  {rememberedUser.name ? rememberedUser.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <div className="overflow-hidden">
+                  <div className="text-sm font-semibold text-[#24292f] truncate">{rememberedUser.name}</div>
+                  <div className="text-xs text-[#57606a] truncate">{rememberedUser.email}</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  setLoginError('');
+                  try {
+                    await quickLogin();
+                  } catch (err: any) {
+                    setLoginError(err.message || 'Login failed');
+                  }
+                }}
+                className="w-full bg-[#0969da] text-white py-1.5 rounded-md text-xs font-semibold hover:bg-[#0854b0] transition flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                ⚡ Instant Sign In
+              </button>
+              <div className="relative my-3">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-[#d0d7de]" />
+                </div>
+                <div className="relative flex justify-center text-[11px]">
+                  <span className="bg-[#f6f8fa] px-2 text-[#57606a]">or sign in with password</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-4">
             {loginError && <div className="text-[#cf222e] text-sm p-3 bg-[#FFEBE9] border border-[#ff818266] rounded-md">{loginError}</div>}
             <div>
               <label className="block text-sm font-medium text-[#24292f] mb-1">Email address</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md focus:ring-2 focus:ring-[#0969da] focus:border-[#0969da] outline-none bg-[#f6f8fa] focus:bg-[#ffffff] text-sm" />
+              <input 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                placeholder={rememberedUser?.email || "name@example.com"}
+                required 
+                className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md focus:ring-2 focus:ring-[#0969da] focus:border-[#0969da] outline-none bg-[#f6f8fa] focus:bg-[#ffffff] text-sm" 
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-[#24292f] mb-1">Password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md focus:ring-2 focus:ring-[#0969da] focus:border-[#0969da] outline-none bg-[#f6f8fa] focus:bg-[#ffffff] text-sm" />
+              <input 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+                className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md focus:ring-2 focus:ring-[#0969da] focus:border-[#0969da] outline-none bg-[#f6f8fa] focus:bg-[#ffffff] text-sm" 
+              />
             </div>
             <button type="submit" className="w-full bg-[#2da44e] text-white py-1.5 rounded-md text-sm font-medium border border-[#2da44e] hover:bg-[#2c974b] transition">Sign in</button>
           </form>
-
-          <div className="mt-4 pt-3 border-t border-[#d0d7de] text-center">
-            <p className="text-xs text-[#57606a] mb-2">Default: <code className="bg-[#f6f8fa] px-1 py-0.5 rounded font-mono text-xs">gopyl@proton.me</code></p>
-            <button 
-              type="button" 
-              onClick={handleQuickDemo} 
-              className="w-full text-xs text-[#0969da] hover:underline font-medium py-1.5 bg-[#f6f8fa] hover:bg-[#eaeef2] border border-[#d0d7de] rounded-md transition flex items-center justify-center gap-1"
-            >
-              ⚡ Instant Admin Login
-            </button>
-          </div>
         </div>
       </div>
     );
