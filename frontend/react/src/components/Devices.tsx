@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Smartphone, Plus, Trash2, Copy, Check, X, ShieldAlert } from 'lucide-react';
+import { Smartphone, Plus, Trash2, Copy, Check, X } from 'lucide-react';
 import { supabase } from '../supabase';
 
 interface Device {

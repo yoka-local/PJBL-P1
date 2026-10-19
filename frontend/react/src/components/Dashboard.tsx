@@ -21,7 +21,7 @@ const DEFAULT_LOGS: AttendanceLog[] = [
 export default function Dashboard() {
   const [logs, setLogs] = useState<AttendanceLog[]>(DEFAULT_LOGS);
   const [totalHadir, setTotalHadir] = useState<number>(342);
-  const [terlambat, setTerlambat] = useState<number>(12);
+  const [terlambat] = useState<number>(12);
   const [kartuDitolak, setKartuDitolak] = useState<number>(3);
   const [doorStatus, setDoorStatus] = useState<'Terkunci' | 'Terbuka'>('Terkunci');
   const [isDeviceOnline, setIsDeviceOnline] = useState<boolean>(true);
