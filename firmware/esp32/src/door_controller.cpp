@@ -30,12 +30,17 @@ void door_init() {
     pinMode(PIN_LED_YELLOW, OUTPUT);
     pinMode(PIN_BUZZER, OUTPUT);
     
-    // Internal pullup for reed switch if needed (adjust based on actual hardware)
-    pinMode(PIN_REED_SWITCH, INPUT_PULLUP); 
+    if (USE_DOOR_MAGNET_SENSOR) {
+        pinMode(PIN_REED_SWITCH, INPUT_PULLUP);
+    }
 
     lockDoor();
     currentState = DoorState::LOCKED;
-    LOG_DOOR("Door controller initialized. Status: LOCKED");
+    if (USE_DOOR_MAGNET_SENSOR) {
+        LOG_DOOR("Door controller initialized. Status: LOCKED (Reed Sensor Enabled)");
+    } else {
+        LOG_DOOR("Door controller initialized. Status: LOCKED (Timer Mode: Magnet Sensor Disabled)");
+    }
 }
 
 void door_unlock() {
@@ -58,10 +63,6 @@ void door_reject() {
         // Long angry beep
         tone(PIN_BUZZER, 500, 500); 
         
-        // dev note: In a fully non-blocking setup, we'd use a timer to turn off the red LED.
-        // For simplicity here, we'll let it stay on until the next loop tick clears it (or add a small timer).
-        // Let's do a quick blocking delay just for the reject animation to keep it simple, 
-        // since it doesn't affect the door state machine.
         delay(500); 
         digitalWrite(PIN_LED_RED, LOW);
     }
@@ -69,6 +70,32 @@ void door_reject() {
 
 void door_update() {
     unsigned long timeInState = millis() - stateEntryTime;
+
+    if (!USE_DOOR_MAGNET_SENSOR) {
+        // === Mode: Timer-based Auto-Relock (No Magnet Sensor) ===
+        switch (currentState) {
+            case DoorState::LOCKED:
+                lockDoor();
+                break;
+
+            case DoorState::UNLOCKED_WAITING:
+                if (timeInState >= UNLOCK_HOLD_TIME_MS) {
+                    LOG_DOOR("Hold time elapsed (5s). Auto-relocking door.");
+                    currentState = DoorState::LOCKED;
+                    stateEntryTime = millis();
+                    lockDoor();
+                }
+                break;
+
+            case DoorState::DOOR_OPEN:
+                currentState = DoorState::LOCKED;
+                lockDoor();
+                break;
+        }
+        return;
+    }
+
+    // === Mode: Full Magnetic Sensor (Reed Switch) ===
     bool isOpen = isDoorPhysicallyOpen();
 
     switch (currentState) {

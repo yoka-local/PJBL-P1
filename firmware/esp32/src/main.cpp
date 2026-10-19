@@ -30,22 +30,22 @@ void loop() {
     
     // 3. Process new card tap
     if (uid != "") {
-        if (rfid_is_card_valid(uid)) {
-            // Valid Card -> Open Door
+        bool isValid = rfid_is_card_valid(uid);
+        if (isValid) {
             door_unlock();
-            
-            // Create Event and Queue it (Offline First!)
-            AttendanceEvent event;
-            event.event_id = generate_event_id(uid);
-            event.card_uid = uid;
-            event.timestamp = get_current_timestamp();
-            event.device_id = DEVICE_ID;
-            
-            queue_push(event);
         } else {
-            // Invalid Card -> Reject
             door_reject();
         }
+
+        // Create Event and Queue it (Offline First!)
+        AttendanceEvent event;
+        event.event_id = generate_event_id(uid);
+        event.card_uid = uid;
+        event.timestamp = get_current_timestamp();
+        event.device_id = DEVICE_ID;
+        event.status = isValid ? "Diterima" : "Ditolak";
+        
+        queue_push(event);
     }
     
     // 4. Update door state machine (handles timeouts and reed switch)

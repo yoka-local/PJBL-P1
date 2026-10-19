@@ -41,6 +41,7 @@ void queue_push(const AttendanceEvent& event) {
     doc["card_uid"] = event.card_uid;
     doc["timestamp"] = event.timestamp;
     doc["device_id"] = event.device_id;
+    doc["status"] = event.status.length() > 0 ? event.status : "Diterima";
 
     if (serializeJson(doc, file) == 0) {
         LOG_SYNC("Failed to write event to file");
@@ -72,6 +73,8 @@ bool queue_peek(AttendanceEvent& event) {
     event.card_uid = doc["card_uid"].as<String>();
     event.timestamp = doc["timestamp"].as<String>();
     event.device_id = doc["device_id"].as<String>();
+    event.status = doc["status"].as<String>();
+    if (event.status.length() == 0) event.status = "Diterima";
     
     file.close();
     return true;

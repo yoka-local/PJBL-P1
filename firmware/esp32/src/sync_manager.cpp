@@ -32,19 +32,20 @@ void sync_update() {
         return; // Queue is empty
     }
 
-    LOG_SYNC(("Syncing event " + event.event_id + " to server...").c_str());
+    LOG_SYNC(("Syncing event " + event.event_id + " to Supabase...").c_str());
 
     HTTPClient http;
     http.begin(API_URL);
     http.addHeader("Content-Type", "application/json");
-    http.addHeader("Authorization", String("Bearer ") + API_TOKEN);
-    http.addHeader("Accept", "application/json");
+    http.addHeader("apikey", SUPABASE_KEY);
+    http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+    http.addHeader("Prefer", "return=minimal");
 
-    StaticJsonDocument<200> doc;
+    StaticJsonDocument<256> doc;
     doc["event_id"] = event.event_id;
     doc["card_uid"] = event.card_uid;
-    doc["timestamp"] = event.timestamp;
     doc["device_id"] = event.device_id;
+    doc["status"] = event.status.length() > 0 ? event.status : "Diterima";
 
     String requestBody;
     serializeJson(doc, requestBody);
@@ -52,23 +53,15 @@ void sync_update() {
     int httpResponseCode = http.POST(requestBody);
 
     if (httpResponseCode > 0) {
-        String responseBody = http.getString();
-        
-        StaticJsonDocument<200> responseDoc;
-        deserializeJson(responseDoc, responseBody);
-        
-        // Both standard success and duplicate are considered success (we can delete local copy)
-        bool success = responseDoc["success"].as<bool>();
-        
-        if (success) {
-            LOG_SYNC("Sync successful.");
+        if (httpResponseCode == 200 || httpResponseCode == 201 || httpResponseCode == 204) {
+            LOG_SYNC("Sync to Supabase successful.");
             queue_remove(event.event_id);
         } else {
-            LOG_SYNC(("Server rejected event: " + responseBody).c_str());
-            // Depending on logic, we might want to remove it if it's a permanent 4xx error
-            // For MVP, we will just log it. If it's 422, we should probably delete it to unblock the queue.
+            String responseBody = http.getString();
+            LOG_SYNC(("Supabase error (" + String(httpResponseCode) + "): " + responseBody).c_str());
             if (httpResponseCode >= 400 && httpResponseCode < 500) {
-                 queue_remove(event.event_id);
+                // If conflict / client error, drop to unblock queue
+                queue_remove(event.event_id);
             }
         }
     } else {

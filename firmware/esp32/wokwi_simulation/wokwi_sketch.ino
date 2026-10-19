@@ -46,7 +46,14 @@
 // ============================================================================
 // SYSTEM TUNABLES & CREDENTIALS
 // ============================================================================
-// Door Timeouts
+// Door Sensor Configuration:
+// Set to 'false' if magnetic door sensor (reed switch) is missing/not used yet.
+// In this mode, the door automatically unlocks for UNLOCK_HOLD_TIME_MS and then relocks.
+// No forced open alarm or door ajar alarm will be triggered.
+#define USE_DOOR_MAGNET_SENSOR false
+#define UNLOCK_HOLD_TIME_MS    5000   // 5 seconds unlock duration
+
+// Door Timeouts (when USE_DOOR_MAGNET_SENSOR == true)
 #define TIMEOUT_UNLOCKED_WAITING_MS 10000   // 10 seconds before auto-relock
 #define TIMEOUT_DOOR_OPEN_MS        30000   // 30 seconds before Door Ajar alarm
 
@@ -55,10 +62,11 @@
 #define WIFI_PASSWORD ""
 #define WIFI_RETRY_INTERVAL_MS 5000
 
-// API Settings
+// Supabase Direct REST API Settings
 #define DEVICE_ID "GATE-01"
-#define API_URL "https://pjbl-website.vercel.app/api/attendance/tap"
-#define API_TOKEN "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkc21jaWZtbGJ3ZWp5aWhvcnFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyODQ4NzIsImV4cCI6MjEwNjg2MDg3Mn0.v2gNc9r0sFR9usBWaTcZhLNI_PKyb9XnMcG04ZHgqzU"
+#define SUPABASE_URL "https://zdsmcifmlbwejyihorqs.supabase.co"
+#define SUPABASE_KEY "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkc21jaWZtbGJ3ZWp5aWhvcnFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyODQ4NzIsImV4cCI6MjEwNjg2MDg3Mn0.v2gNc9r0sFR9usBWaTcZhLNI_PKyb9XnMcG04ZHgqzU"
+#define API_URL "https://zdsmcifmlbwejyihorqs.supabase.co/rest/v1/attendances"
 
 // ============================================================================
 // LOGGING MACROS
@@ -83,6 +91,7 @@ struct AttendanceEvent {
     String card_uid;
     String timestamp;
     String device_id;
+    String status; // "Diterima" or "Ditolak"
 };
 
 MFRC522 mfrc522(PIN_RFID_SS, PIN_RFID_RST);
@@ -127,11 +136,18 @@ void door_init() {
     pinMode(PIN_LED_RED, OUTPUT);
     pinMode(PIN_LED_YELLOW, OUTPUT);
     pinMode(PIN_BUZZER, OUTPUT);
-    pinMode(PIN_REED_SWITCH, INPUT_PULLUP);
+    
+    if (USE_DOOR_MAGNET_SENSOR) {
+        pinMode(PIN_REED_SWITCH, INPUT_PULLUP);
+    }
 
     lockDoorHardware();
     currentDoorState = DoorState::LOCKED;
-    LOG_DOOR("Door Controller Initialized. State: LOCKED");
+    if (USE_DOOR_MAGNET_SENSOR) {
+        LOG_DOOR("Door Controller Initialized. Mode: FULL SENSOR (Reed Switch Enabled)");
+    } else {
+        LOG_DOOR("Door Controller Initialized. Mode: TIMER-RELOCK (Magnet Sensor Disabled)");
+    }
 }
 
 void door_unlock() {
@@ -154,6 +170,33 @@ void door_reject() {
 
 void door_update() {
     unsigned long timeInState = millis() - doorStateEntryTime;
+
+    if (!USE_DOOR_MAGNET_SENSOR) {
+        // === Mode: Timer-based Auto-Relock (No Magnet Sensor) ===
+        switch (currentDoorState) {
+            case DoorState::LOCKED:
+                lockDoorHardware();
+                break;
+
+            case DoorState::UNLOCKED_WAITING:
+                // Stay unlocked for UNLOCK_HOLD_TIME_MS, then automatically relock
+                if (timeInState >= UNLOCK_HOLD_TIME_MS) {
+                    LOG_DOOR("Hold time elapsed (5s). Auto-relocking door.");
+                    currentDoorState = DoorState::LOCKED;
+                    doorStateEntryTime = millis();
+                    lockDoorHardware();
+                }
+                break;
+
+            case DoorState::DOOR_OPEN:
+                currentDoorState = DoorState::LOCKED;
+                lockDoorHardware();
+                break;
+        }
+        return;
+    }
+
+    // === Mode: Full Magnetic Sensor (Reed Switch) ===
     bool isOpen = isDoorPhysicallyOpen();
 
     switch (currentDoorState) {
@@ -283,6 +326,7 @@ void queue_push(const AttendanceEvent& event) {
             doc["card_uid"] = event.card_uid;
             doc["timestamp"] = event.timestamp;
             doc["device_id"] = event.device_id;
+            doc["status"] = event.status.length() > 0 ? event.status : "Diterima";
             serializeJson(doc, file);
             file.close();
             LOG_SYNC(("Queued event to SPIFFS: " + event.event_id).c_str());
@@ -314,6 +358,8 @@ bool queue_peek(AttendanceEvent& event) {
                         event.card_uid = doc["card_uid"].as<String>();
                         event.timestamp = doc["timestamp"].as<String>();
                         event.device_id = doc["device_id"].as<String>();
+                        event.status = doc["status"].as<String>();
+                        if (event.status.length() == 0) event.status = "Diterima";
                         file.close();
                         root.close();
                         return true;

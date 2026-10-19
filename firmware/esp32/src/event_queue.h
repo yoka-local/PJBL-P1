@@ -6,6 +6,7 @@ struct AttendanceEvent {
     String card_uid;
     String timestamp;
     String device_id;
+    String status; // "Diterima" or "Ditolak"
 };
 
 // Initialize LittleFS/SPIFFS
