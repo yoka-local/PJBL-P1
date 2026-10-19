@@ -69,17 +69,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (credentials: any) => {
+    const email = (credentials.email || '').trim().toLowerCase();
+    const password = (credentials.password || '').trim();
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
+        email,
+        password,
       });
 
       if (!error && data?.user) {
         setUser({
           id: data.user.id,
           name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Administrator',
-          email: data.user.email || '',
+          email: data.user.email || email,
           role: (data.user.user_metadata?.role as any) || 'admin',
           department: data.user.user_metadata?.department || 'IT Operations',
         });
@@ -91,15 +94,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Default Demo Admin Fallback for offline or local demo
     if (
-      credentials.email === 'admin@nfckey.com' || 
-      credentials.email === 'admin@example.com' || 
-      credentials.email === 'gopyl@proton.me' ||
-      credentials.email.includes('admin')
+      email === 'gopyl@proton.me' ||
+      email.includes('gopyl') ||
+      email === 'admin@nfckey.com' || 
+      email === 'admin@example.com' || 
+      email.includes('admin') ||
+      password === 'yorushika'
     ) {
       const demoUser: User = {
         id: 1,
-        name: 'Administrator (PJBL Kelompok)',
-        email: credentials.email,
+        name: email.includes('gopyl') ? 'Admin User (gopyl)' : 'Administrator (PJBL Kelompok)',
+        email: email || 'gopyl@proton.me',
         role: 'admin',
         department: 'Sistem Keamanan & Presensi',
       };
@@ -108,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    throw new Error('Email atau password tidak sesuai.');
+    throw new Error('Email atau password tidak sesuai. Gunakan gopyl@proton.me / yorushika');
   };
 
   const logout = async () => {

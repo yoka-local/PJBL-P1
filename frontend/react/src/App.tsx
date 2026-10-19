@@ -21,7 +21,17 @@ function App() {
     try {
       await login({ email, password });
     } catch (err: any) {
-      setLoginError(err.response?.data?.message || 'Login failed');
+      setLoginError(err.message || err.response?.data?.message || 'Login failed');
+    }
+  };
+
+  const handleQuickDemo = async () => {
+    setEmail('gopyl@proton.me');
+    setPassword('yorushika');
+    try {
+      await login({ email: 'gopyl@proton.me', password: 'yorushika' });
+    } catch (err: any) {
+      setLoginError(err.message || 'Login failed');
     }
   };
 
@@ -49,6 +59,17 @@ function App() {
             </div>
             <button type="submit" className="w-full bg-[#2da44e] text-white py-1.5 rounded-md text-sm font-medium border border-[#2da44e] hover:bg-[#2c974b] transition">Sign in</button>
           </form>
+
+          <div className="mt-4 pt-3 border-t border-[#d0d7de] text-center">
+            <p className="text-xs text-[#57606a] mb-2">Default: <code className="bg-[#f6f8fa] px-1 py-0.5 rounded font-mono text-xs">gopyl@proton.me</code></p>
+            <button 
+              type="button" 
+              onClick={handleQuickDemo} 
+              className="w-full text-xs text-[#0969da] hover:underline font-medium py-1.5 bg-[#f6f8fa] hover:bg-[#eaeef2] border border-[#d0d7de] rounded-md transition flex items-center justify-center gap-1"
+            >
+              ⚡ Instant Admin Login
+            </button>
+          </div>
         </div>
       </div>
     );
