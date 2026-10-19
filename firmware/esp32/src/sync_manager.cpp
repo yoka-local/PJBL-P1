@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <ArduinoJson.h>
 #include "config.h"
 #include "sync_manager.h"
 #include "event_queue.h"
@@ -41,14 +40,10 @@ void sync_update() {
     http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
     http.addHeader("Prefer", "return=minimal");
 
-    StaticJsonDocument<256> doc;
-    doc["event_id"] = event.event_id;
-    doc["card_uid"] = event.card_uid;
-    doc["device_id"] = event.device_id;
-    doc["status"] = event.status.length() > 0 ? event.status : "Diterima";
-
-    String requestBody;
-    serializeJson(doc, requestBody);
+    String requestBody = "{\"event_id\":\"" + event.event_id + 
+                         "\",\"card_uid\":\"" + event.card_uid + 
+                         "\",\"device_id\":\"" + event.device_id + 
+                         "\",\"status\":\"" + (event.status.length() > 0 ? event.status : "Diterima") + "\"}";
 
     int httpResponseCode = http.POST(requestBody);
 

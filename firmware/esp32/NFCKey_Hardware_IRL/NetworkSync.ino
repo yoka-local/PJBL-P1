@@ -6,7 +6,6 @@
 
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <ArduinoJson.h>
 #include "Config.h"
 
 #define QUEUE_MAX 20
@@ -98,14 +97,10 @@ void sync_update() {
     http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
     http.addHeader("Prefer", "return=minimal");
 
-    StaticJsonDocument<256> doc;
-    doc["event_id"] = event.event_id;
-    doc["card_uid"] = event.card_uid;
-    doc["device_id"] = event.device_id;
-    doc["status"] = event.status;
-
-    String requestBody;
-    serializeJson(doc, requestBody);
+    String requestBody = "{\"event_id\":\"" + event.event_id + 
+                         "\",\"card_uid\":\"" + event.card_uid + 
+                         "\",\"device_id\":\"" + event.device_id + 
+                         "\",\"status\":\"" + event.status + "\"}";
 
     int httpResponseCode = http.POST(requestBody);
 
