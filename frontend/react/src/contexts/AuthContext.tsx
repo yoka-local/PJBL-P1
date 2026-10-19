@@ -90,10 +90,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Default Demo Admin Fallback for offline or local demo
-    if (credentials.email === 'admin@nfckey.com' || credentials.email === 'admin@example.com' || credentials.email.includes('admin')) {
+    if (
+      credentials.email === 'admin@nfckey.com' || 
+      credentials.email === 'admin@example.com' || 
+      credentials.email === 'gopyl@proton.me' ||
+      credentials.email.includes('admin')
+    ) {
       const demoUser: User = {
         id: 1,
-        name: 'Administrator (PJBL Kelompok Medan)',
+        name: 'Administrator (PJBL Kelompok)',
         email: credentials.email,
         role: 'admin',
         department: 'Sistem Keamanan & Presensi',
