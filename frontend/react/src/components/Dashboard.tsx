@@ -11,13 +11,6 @@ interface AttendanceLog {
   status: 'Diterima' | 'Ditolak';
 }
 
-const DEFAULT_LOGS: AttendanceLog[] = [
-  { time: '07:14:22', name: 'Budi Santoso', class_: 'IT Support', uid: '04:A3:92:7F', status: 'Diterima' },
-  { time: '07:15:05', name: 'Siti Aminah', class_: 'Finance', uid: '11:22:33:44', status: 'Diterima' },
-  { time: '07:22:11', name: 'Kartu Tidak Dikenal', class_: '-', uid: 'X9:Y8:Z7:W6', status: 'Ditolak' },
-  { time: '07:25:30', name: 'Andi Wijaya', class_: 'HRD', uid: 'DE:AD:BE:EF', status: 'Diterima' },
-];
-
 export default function Dashboard() {
   const [logs, setLogs] = useState<AttendanceLog[]>([]);
   const [totalHadir, setTotalHadir] = useState<number>(0);

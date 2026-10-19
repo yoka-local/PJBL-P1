@@ -10,13 +10,6 @@ interface CardItem {
   active: boolean;
 }
 
-const DEFAULT_CARDS: CardItem[] = [
-  { id: 1, uid: '04:A3:92:7F', owner: 'Budi Santoso', role: 'Pegawai (Shift Pagi)', active: true },
-  { id: 2, uid: '11:22:33:44', owner: 'Siti Aminah', role: 'Staff Administrasi', active: true },
-  { id: 3, uid: 'DE:AD:BE:EF', owner: 'Pak Manajer', role: 'Admin (Akses 24/7)', active: true },
-  { id: 4, uid: 'X9:Y8:Z7:W6', owner: 'Belum Terdaftar', role: 'Tamu', active: false },
-];
-
 export default function Cards() {
   const [cards, setCards] = useState<CardItem[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);

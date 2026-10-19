@@ -10,11 +10,6 @@ interface Device {
   last_seen: string | null;
 }
 
-const DEFAULT_DEVICES: Device[] = [
-  { id: 1, device_id: 'GATE-01', name: 'Pintu Gerbang Utama / Lab', status: 'online', last_seen: new Date().toISOString() },
-  { id: 2, device_id: 'GATE-02', name: 'Pintu Ruang Guru', status: 'offline', last_seen: null },
-];
-
 export default function Devices() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [showAdd, setShowAdd] = useState(false);

@@ -10,13 +10,6 @@ interface UserItem {
   card_uid: string;
 }
 
-const DEFAULT_USERS: UserItem[] = [
-  { id: 1, user_code: 'EMP-101', name: 'Budi Santoso', dept: 'IT Support', card_uid: '04:A3:92:7F' },
-  { id: 2, user_code: 'EMP-102', name: 'Siti Aminah', dept: 'Finance', card_uid: '11:22:33:44' },
-  { id: 3, user_code: 'EMP-103', name: 'Andi Wijaya', dept: 'HRD', card_uid: 'DE:AD:BE:EF' },
-  { id: 4, user_code: 'EMP-104', name: 'Rina Marlina', dept: 'Marketing', card_uid: 'Belum Terhubung' },
-];
-
 export default function Users() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [showModal, setShowModal] = useState(false);

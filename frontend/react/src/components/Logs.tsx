@@ -12,13 +12,6 @@ interface LogItem {
   status: 'Diterima' | 'Ditolak';
 }
 
-const DEFAULT_LOGS: LogItem[] = [
-  { id: 1, event_id: 'GATE-01_17290001_101', time: '19 Okt, 07:14:22', name: 'Budi Santoso', uid: '04:A3:92:7F', device: 'GATE-01', status: 'Diterima' },
-  { id: 2, event_id: 'GATE-01_17290002_102', time: '19 Okt, 07:15:05', name: 'Siti Aminah', uid: '11:22:33:44', device: 'GATE-01', status: 'Diterima' },
-  { id: 3, event_id: 'GATE-01_17290003_103', time: '19 Okt, 07:22:11', name: 'Kartu Tidak Dikenal', uid: 'X9:Y8:Z7:W6', device: 'GATE-01', status: 'Ditolak' },
-  { id: 4, event_id: 'GATE-01_17290004_104', time: '19 Okt, 07:25:30', name: 'Andi Wijaya', uid: 'DE:AD:BE:EF', device: 'GATE-01', status: 'Diterima' },
-];
-
 export default function Logs() {
   const [logs, setLogs] = useState<LogItem[]>([]);
   const [search, setSearch] = useState<string>('');
