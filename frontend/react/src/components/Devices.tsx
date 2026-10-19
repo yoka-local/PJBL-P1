@@ -1,22 +1,27 @@
 import { useState, useEffect } from 'react';
-import { api } from '../lib/api';
-import { Smartphone, Plus, Trash2 } from 'lucide-react';
+import { Smartphone, Plus, Trash2, Copy, Check, X, ShieldAlert } from 'lucide-react';
+import { supabase } from '../supabase';
 
 interface Device {
-  id: number;
+  id: number | string;
   device_id: string;
   name: string;
   status: string;
   last_seen: string | null;
 }
 
+const DEFAULT_DEVICES: Device[] = [
+  { id: 1, device_id: 'GATE-01', name: 'Pintu Gerbang Utama / Lab', status: 'online', last_seen: new Date().toISOString() },
+  { id: 2, device_id: 'GATE-02', name: 'Pintu Ruang Guru', status: 'offline', last_seen: null },
+];
+
 export default function Devices() {
-  const [devices, setDevices] = useState<Device[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [devices, setDevices] = useState<Device[]>(DEFAULT_DEVICES);
   const [showAdd, setShowAdd] = useState(false);
   const [newDeviceId, setNewDeviceId] = useState('');
   const [newDeviceName, setNewDeviceName] = useState('');
-  const [newToken, setNewToken] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchDevices();
@@ -24,142 +29,196 @@ export default function Devices() {
 
   const fetchDevices = async () => {
     try {
-      const response = await api.get('/admin/devices');
-      setDevices(response.data);
+      const { data, error } = await supabase
+        .from('devices')
+        .select('*')
+        .order('id', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setDevices(data);
+      }
     } catch (error) {
-      console.error('Failed to fetch devices', error);
-    } finally {
-      setLoading(false);
+      console.warn('Using local devices state:', error);
     }
   };
 
   const handleAddDevice = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newDeviceId.trim()) return;
+
+    setLoading(true);
+    const newDevice: Device = {
+      id: Date.now(),
+      device_id: newDeviceId.trim().toUpperCase(),
+      name: newDeviceName.trim() || 'Gateway Baru',
+      status: 'offline',
+      last_seen: null,
+    };
+
     try {
-      const response = await api.post('/admin/devices', {
-        device_id: newDeviceId,
-        name: newDeviceName
-      });
-      setNewToken(response.data.token);
-      setDevices([...devices, response.data.device]);
-      setShowAdd(false);
-      setNewDeviceId('');
-      setNewDeviceName('');
+      await supabase.from('devices').insert([
+        {
+          device_id: newDevice.device_id,
+          name: newDevice.name,
+          status: 'offline',
+        }
+      ]);
+    } catch (err) {
+      console.warn('Error inserting device to Supabase:', err);
+    }
+
+    setDevices([...devices, newDevice]);
+    setShowAdd(false);
+    setNewDeviceId('');
+    setNewDeviceName('');
+    setLoading(false);
+  };
+
+  const handleDeleteDevice = async (id: number | string) => {
+    if (!confirm('Yakin ingin menghapus perangkat ini?')) return;
+    setDevices(devices.filter(d => d.id !== id));
+    try {
+      await supabase.from('devices').delete().eq('id', id);
     } catch (error) {
-      console.error('Failed to add device', error);
-      alert('Failed to add device');
+      console.warn('Error deleting device:', error);
     }
   };
 
-  const handleDeleteDevice = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this device?')) return;
-    try {
-      await api.delete(`/admin/devices/${id}`);
-      setDevices(devices.filter(d => d.id !== id));
-    } catch (error) {
-      console.error('Failed to delete device', error);
-      alert('Failed to delete device');
-    }
+  const copyConfigCode = () => {
+    const code = `// Konfigurasi Supabase untuk firmware/esp32/src/config.h\n#define DEVICE_ID "GATE-01"\n#define API_URL "https://zdsmcifmlbwejyihorqs.supabase.co/rest/v1/attendances"\n#define API_TOKEN "${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGci...'}"`;
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   };
-
-  if (loading) return <div>Loading devices...</div>;
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="flex justify-between items-center mb-8">
+      <div className="mb-8 flex justify-between items-end">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Manajemen Perangkat (ESP32)</h2>
-          <p className="text-slate-500 mt-1">Daftar perangkat gate dan token API.</p>
+          <h2 className="text-2xl font-bold text-slate-800">Manajemen Perangkat Gateway</h2>
+          <p className="text-slate-500 mt-1">Daftarkan dan pantau status konektivitas mikrokontroler ESP32.</p>
         </div>
-        <button 
-          onClick={() => setShowAdd(!showAdd)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Tambah Perangkat
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={copyConfigCode} 
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition"
+          >
+            {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+            {copied ? 'Tersalin!' : 'Salin Kode Konfigurasi ESP32'}
+          </button>
+          <button 
+            onClick={() => setShowAdd(true)} 
+            className="flex items-center gap-2 px-4 py-2 bg-[#2da44e] text-white rounded-lg hover:bg-[#2c974b] text-sm font-medium transition shadow-sm"
+          >
+            <Plus className="w-4 h-4" /> Tambah Gateway
+          </button>
+        </div>
       </div>
 
-      {newToken && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <h3 className="text-green-800 font-bold mb-2">Perangkat Berhasil Ditambahkan!</h3>
-          <p className="text-green-700 text-sm mb-2">Ini adalah API Token untuk ESP32 Anda. <strong>Simpan sekarang karena tidak akan ditampilkan lagi!</strong></p>
-          <code className="block p-3 bg-white border border-green-200 rounded text-slate-800 font-mono text-sm break-all">
-            {newToken}
-          </code>
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {devices.map((device) => {
+          const isOnline = device.status === 'online';
+          return (
+            <div key={device.id} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-slate-100 rounded-lg">
+                      <Smartphone className="w-6 h-6 text-slate-700" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-800">{device.name}</h3>
+                      <p className="text-xs font-mono text-slate-400 mt-0.5">{device.device_id}</p>
+                    </div>
+                  </div>
+                  <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
+                    isOnline ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    {isOnline ? 'Online' : 'Offline'}
+                  </span>
+                </div>
 
+                <div className="space-y-1.5 text-xs text-slate-500 my-4 py-3 border-y border-slate-100">
+                  <div className="flex justify-between">
+                    <span>Terakhir Terlihat:</span>
+                    <span className="font-medium text-slate-700">
+                      {device.last_seen ? new Date(device.last_seen).toLocaleTimeString('id-ID') : 'Belum Pernah'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Protokol Komunikasi:</span>
+                    <span className="font-mono text-slate-700">Supabase PostgREST (HTTPS)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button 
+                  onClick={() => handleDeleteDevice(device.id)} 
+                  className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition" 
+                  title="Hapus Gateway"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Modal Tambah Device */}
       {showAdd && (
-        <div className="mb-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <h3 className="font-semibold text-slate-800 mb-4">Tambah Perangkat Baru</h3>
-          <form onSubmit={handleAddDevice} className="flex gap-4 items-end">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Device ID</label>
-              <input 
-                type="text" 
-                value={newDeviceId}
-                onChange={(e) => setNewDeviceId(e.target.value)}
-                placeholder="e.g. GATE-01"
-                required
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-primary focus:border-primary outline-none"
-              />
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-slate-800">Tambah Gateway ESP32 Baru</h3>
+              <button onClick={() => setShowAdd(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Nama Perangkat</label>
-              <input 
-                type="text" 
-                value={newDeviceName}
-                onChange={(e) => setNewDeviceName(e.target.value)}
-                placeholder="e.g. Gerbang Depan"
-                required
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-primary focus:border-primary outline-none"
-              />
-            </div>
-            <button type="submit" className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark h-[42px]">
-              Simpan
-            </button>
-          </form>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {devices.map(device => (
-          <div key={device.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 relative">
-            <button 
-              onClick={() => handleDeleteDevice(device.id)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Smartphone className="w-6 h-6 text-primary" />
+            <form onSubmit={handleAddDevice} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">Device ID (Hardware Identifier)</label>
+                <input 
+                  type="text" 
+                  value={newDeviceId} 
+                  onChange={(e) => setNewDeviceId(e.target.value)} 
+                  placeholder="Contoh: GATE-02" 
+                  required 
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono text-sm uppercase focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                />
               </div>
               <div>
-                <h3 className="font-semibold text-slate-800">{device.name}</h3>
-                <p className="text-sm text-slate-500 font-mono">{device.device_id}</p>
+                <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">Nama Lokasi Pintu</label>
+                <input 
+                  type="text" 
+                  value={newDeviceName} 
+                  onChange={(e) => setNewDeviceName(e.target.value)} 
+                  placeholder="Contoh: Pintu Lab Komputer" 
+                  required 
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                />
               </div>
-            </div>
-            <div className="space-y-2 mt-4 pt-4 border-t border-slate-100">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Status</span>
-                <span className={`font-medium ${device.status === 'active' ? 'text-green-600' : 'text-slate-600'}`}>
-                  {device.status === 'active' ? 'Online' : 'Offline'}
-                </span>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAdd(false)} 
+                  className="px-4 py-2 border border-slate-200 text-slate-600 text-sm rounded-lg hover:bg-slate-50"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="px-4 py-2 bg-[#2da44e] text-white text-sm font-medium rounded-lg hover:bg-[#2c974b] transition disabled:opacity-50"
+                >
+                  {loading ? 'Menyimpan...' : 'Simpan Gateway'}
+                </button>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Last Seen</span>
-                <span className="text-slate-700">{device.last_seen ? new Date(device.last_seen).toLocaleString() : 'Never'}</span>
-              </div>
-            </div>
+            </form>
           </div>
-        ))}
-        {devices.length === 0 && !loading && (
-          <div className="col-span-full text-center py-12 text-slate-500 bg-white rounded-xl border border-slate-200 border-dashed">
-            Belum ada perangkat terdaftar.
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

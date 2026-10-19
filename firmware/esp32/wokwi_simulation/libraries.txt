@@ -1,0 +1,3 @@
+# Wokwi Library List
+MFRC522
+ArduinoJson

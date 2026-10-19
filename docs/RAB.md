@@ -9,7 +9,7 @@ Dokumen ini memuat rincian **Rencana dan Realisasi Anggaran Biaya (RAB)** aktual
 | No | Nama Komponen | Spesifikasi / Keterangan | Estimasi Awal (Rp) | Harga Realisasi (Rp) | Status Pengadaan |
 |:---:|---|---|:---:|:---:|:---:|
 | 1 | **ESP32 Development Board** | NodeMCU WROOM-32 38-Pin (Disediakan sekolah) | 45.000 – 50.000 | **Rp 0** *(Inventaris Sekolah)* | [x] Acquired |
-| 2 | **Modul NFC RFID PN532 V3** | Pembaca NFC (e-Money, Smart Tag, HP) & RFID 13.56 MHz | 55.000 – 65.000 | **Rp 58.000** | [x] Acquired |
+| 2 | **Modul NFC RFID PN532 V3** | Pembaca NFC (e-Money, Smart Tag, HP) & RFID 13.56 MHz | 55.000 – 65.000 | **Rp 68.000** | [x] Acquired |
 | 3 | **Mini Solenoid Door Lock** | **Versi 12V** (Fail-Secure, lidah kunci elektromagnetik) | 35.000 – 45.000 | **Rp 38.000** | [x] Acquired |
 | 4 | **Adaptor DC 12V 2A** | Catu daya utama 12V untuk Solenoid & Rangkaian | 25.000 – 35.000 | **Rp 28.000** | [x] Acquired |
 | 5 | **Step-Down Module LM2596** | Penurun 12V ke 5.0V stabil untuk ESP32 & Relay | 12.000 – 15.000 | **Rp 13.000** | [x] Acquired |
@@ -26,12 +26,12 @@ Dokumen ini memuat rincian **Rencana dan Realisasi Anggaran Biaya (RAB)** aktual
 
 ## 🧮 Rekapitulasi Total Biaya Aktual
 
-* **Total Nilai Riil Hardware (Termasuk Nilai ESP32):** **Rp 236.000**
-* **Total Pengeluaran Kas Riil (ESP32 Disediakan Sekolah):** **Rp 188.000**
+* **Total Nilai Riil Hardware (Termasuk Nilai ESP32):** **Rp 246.000**
+* **Total Pengeluaran Kas Riil (ESP32 Disediakan Sekolah):** **Rp 198.000**
 * **Status Pengadaan Fisik:** **100% Selesai (13 / 13 Item Lengkap)**
 
 ### 👥 Pembagian Iuran Kelompok (7 Anggota)
-$$\text{Iuran per Anggota} = \frac{\text{Total Pengeluaran Kas}}{\text{Jumlah Anggota}} = \frac{\text{Rp 188.000}}{7} \approx \mathbf{Rp\ 26.850\ \text{(Digenapkan: Rp 27.000)}}$$
+$$\text{Iuran per Anggota} = \frac{\text{Total Pengeluaran Kas}}{\text{Jumlah Anggota}} = \frac{\text{Rp 198.000}}{7} \approx \mathbf{Rp\ 28.285\ \text{(Digenapkan: Rp 28.500)}}$$
 
 ---
 

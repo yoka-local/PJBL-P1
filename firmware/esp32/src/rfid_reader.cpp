@@ -54,7 +54,7 @@ String rfid_update() {
 bool rfid_is_card_valid(const String& uid) {
     // Phase 2 stub: hardcoded accepted cards. 
     // In Phase 5, this will check the local offline cache stored in SPIFFS
-    if (uid == "04:A3:92:7F" || uid == "DE:AD:BE:EF") {
+    if (uid == "04:A3:92:7F" || uid == "11:22:33:44" || uid == "DE:AD:BE:EF") {
         return true;
     }
     return false;

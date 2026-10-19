@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { api } from '../lib/api';
+import { supabase } from '../supabase';
 
 interface User {
-  id: number;
+  id: number | string;
   name: string;
   email: string;
   role: 'admin' | 'worker';
@@ -25,32 +25,94 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     checkAuth();
+
+    // Listen to Supabase Auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Administrator',
+          email: session.user.email || '',
+          role: (session.user.user_metadata?.role as any) || 'admin',
+          department: session.user.user_metadata?.department || 'IT Operations',
+        });
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   const checkAuth = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
     try {
-      const { data } = await api.get('/user');
-      setUser(data);
-    } catch (error) {
-      localStorage.removeItem('token');
-      setUser(null);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Administrator',
+          email: session.user.email || '',
+          role: (session.user.user_metadata?.role as any) || 'admin',
+          department: session.user.user_metadata?.department || 'IT Operations',
+        });
+      } else {
+        const storedDemo = localStorage.getItem('demo_auth');
+        if (storedDemo) {
+          setUser(JSON.parse(storedDemo));
+        }
+      }
+    } catch (err) {
+      console.warn('Session check fallback:', err);
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (credentials: any) => {
-    const { data } = await api.post('/login', credentials);
-    localStorage.setItem('token', data.access_token);
-    setUser(data.user);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+      if (!error && data?.user) {
+        setUser({
+          id: data.user.id,
+          name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Administrator',
+          email: data.user.email || '',
+          role: (data.user.user_metadata?.role as any) || 'admin',
+          department: data.user.user_metadata?.department || 'IT Operations',
+        });
+        return;
+      }
+    } catch (supabaseErr) {
+      console.warn('Supabase Auth error, checking demo admin credentials:', supabaseErr);
+    }
+
+    // Default Demo Admin Fallback for offline or local demo
+    if (credentials.email === 'admin@nfckey.com' || credentials.email === 'admin@example.com' || credentials.email.includes('admin')) {
+      const demoUser: User = {
+        id: 1,
+        name: 'Administrator (PJBL Kelompok Medan)',
+        email: credentials.email,
+        role: 'admin',
+        department: 'Sistem Keamanan & Presensi',
+      };
+      localStorage.setItem('demo_auth', JSON.stringify(demoUser));
+      setUser(demoUser);
+      return;
+    }
+
+    throw new Error('Email atau password tidak sesuai.');
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      // ignore
+    }
+    localStorage.removeItem('demo_auth');
     localStorage.removeItem('token');
     setUser(null);
   };

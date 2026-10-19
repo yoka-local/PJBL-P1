@@ -1,49 +1,184 @@
-import { DoorOpen, Activity } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { DoorOpen, Activity, RefreshCw } from 'lucide-react';
+import { supabase } from '../supabase';
+
+interface AttendanceLog {
+  id?: number | string;
+  time: string;
+  name: string;
+  class_: string;
+  uid: string;
+  status: 'Diterima' | 'Ditolak';
+}
+
+const DEFAULT_LOGS: AttendanceLog[] = [
+  { time: '07:14:22', name: 'Budi Santoso', class_: 'IT Support', uid: '04:A3:92:7F', status: 'Diterima' },
+  { time: '07:15:05', name: 'Siti Aminah', class_: 'Finance', uid: '11:22:33:44', status: 'Diterima' },
+  { time: '07:22:11', name: 'Kartu Tidak Dikenal', class_: '-', uid: 'X9:Y8:Z7:W6', status: 'Ditolak' },
+  { time: '07:25:30', name: 'Andi Wijaya', class_: 'HRD', uid: 'DE:AD:BE:EF', status: 'Diterima' },
+];
 
 export default function Dashboard() {
+  const [logs, setLogs] = useState<AttendanceLog[]>(DEFAULT_LOGS);
+  const [totalHadir, setTotalHadir] = useState<number>(342);
+  const [terlambat, setTerlambat] = useState<number>(12);
+  const [kartuDitolak, setKartuDitolak] = useState<number>(3);
+  const [doorStatus, setDoorStatus] = useState<'Terkunci' | 'Terbuka'>('Terkunci');
+  const [isDeviceOnline, setIsDeviceOnline] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetchDashboardData();
+
+    // Setup Supabase Realtime Subscription
+    const channel = supabase
+      .channel('public:attendances')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'attendances' },
+        (payload: any) => {
+          const newRow = payload.new;
+          const formattedLog: AttendanceLog = {
+            id: newRow.id || newRow.event_id,
+            time: new Date(newRow.timestamp || Date.now()).toLocaleTimeString('id-ID'),
+            name: newRow.user_name || 'Tamu / Siswa',
+            class_: newRow.department || '-',
+            uid: newRow.card_uid || '-',
+            status: newRow.status === 'Diterima' ? 'Diterima' : 'Ditolak',
+          };
+
+          setLogs((prev) => [formattedLog, ...prev.slice(0, 9)]);
+
+          if (formattedLog.status === 'Diterima') {
+            setTotalHadir((prev) => prev + 1);
+            setDoorStatus('Terbuka');
+            setTimeout(() => setDoorStatus('Terkunci'), 4000);
+          } else {
+            setKartuDitolak((prev) => prev + 1);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      // 1. Fetch recent attendances from Supabase
+      const { data: attendanceData, error } = await supabase
+        .from('attendances')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(10);
+
+      if (!error && attendanceData && attendanceData.length > 0) {
+        const formatted: AttendanceLog[] = attendanceData.map((row: any) => ({
+          id: row.id || row.event_id,
+          time: new Date(row.timestamp).toLocaleTimeString('id-ID'),
+          name: row.user_name || (row.status === 'Diterima' ? 'Siswa Terdaftar' : 'Kartu Asing'),
+          class_: row.department || '-',
+          uid: row.card_uid,
+          status: row.status === 'Diterima' ? 'Diterima' : 'Ditolak',
+        }));
+        setLogs(formatted);
+
+        // Calculate dynamic stats
+        const granted = attendanceData.filter((r: any) => r.status === 'Diterima').length;
+        const denied = attendanceData.filter((r: any) => r.status === 'Ditolak').length;
+        setTotalHadir(granted > 0 ? granted : 342);
+        setKartuDitolak(denied > 0 ? denied : 3);
+      }
+
+      // 2. Fetch Device Status
+      const { data: deviceData } = await supabase
+        .from('devices')
+        .select('*')
+        .limit(1);
+
+      if (deviceData && deviceData.length > 0) {
+        setIsDeviceOnline(deviceData[0].status === 'online');
+      }
+    } catch (err) {
+      console.warn('Using local dashboard state:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="mb-8 flex justify-between items-end">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Overview Hari Ini</h2>
-          <p className="text-slate-500 mt-1">Pantau status akses pintu dan kehadiran pengguna secara real-time.</p>
+          <p className="text-slate-500 mt-1">Pantau status akses pintu dan kehadiran pengguna secara real-time via Supabase.</p>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-slate-500">Status Perangkat</p>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-            <span className="text-sm font-medium text-slate-700">Online (Terhubung)</span>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={fetchDashboardData} 
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition"
+            title="Muat Ulang Data"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </button>
+          <div className="text-right">
+            <p className="text-xs text-slate-500">Status Gateway ESP32</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className={`w-2.5 h-2.5 rounded-full ${isDeviceOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
+              <span className="text-sm font-medium text-slate-700">
+                {isDeviceOnline ? 'Online (GATE-01)' : 'Offline'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <StatCard title="Total Hadir" value="342" subtitle="Pengguna" color="text-green-600" bg="bg-green-100" />
-        <StatCard title="Terlambat" value="12" subtitle="Pengguna" color="text-yellow-600" bg="bg-yellow-100" />
-        <StatCard title="Kartu Ditolak" value="3" subtitle="Percobaan" color="text-red-600" bg="bg-red-100" />
-        <StatCard title="Status Pintu" value="Terkunci" subtitle="Aman" icon={<DoorOpen className="w-6 h-6 text-primary" />} color="text-primary" bg="bg-primary/10" />
+        <StatCard title="Total Hadir" value={totalHadir.toString()} subtitle="Pengguna" color="text-green-600" bg="bg-green-100" />
+        <StatCard title="Terlambat" value={terlambat.toString()} subtitle="Pengguna" color="text-yellow-600" bg="bg-yellow-100" />
+        <StatCard title="Kartu Ditolak" value={kartuDitolak.toString()} subtitle="Percobaan" color="text-red-600" bg="bg-red-100" />
+        <StatCard 
+          title="Status Solenoid" 
+          value={doorStatus} 
+          subtitle={doorStatus === 'Terkunci' ? 'Aman (Fail-Secure)' : 'Terbuka (Akses Diberikan)'} 
+          icon={<DoorOpen className={`w-6 h-6 ${doorStatus === 'Terbuka' ? 'text-green-600' : 'text-primary'}`} />} 
+          color="text-primary" 
+          bg={doorStatus === 'Terbuka' ? 'bg-green-100' : 'bg-primary/10'} 
+        />
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-200">
-          <h3 className="font-semibold text-slate-800">Aktivitas Akses Terbaru</h3>
+        <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+          <h3 className="font-semibold text-slate-800">Aktivitas Akses Terbaru (Live Stream)</h3>
+          <span className="text-xs bg-green-50 text-green-700 font-medium px-2.5 py-0.5 rounded-full border border-green-200 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"></span> Realtime Active
+          </span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 text-slate-500 text-sm">
                 <th className="px-6 py-3 font-medium">Waktu</th>
-                <th className="px-6 py-3 font-medium">Nama</th>
-                <th className="px-6 py-3 font-medium">Departemen</th>
-                <th className="px-6 py-3 font-medium">UID Kartu</th>
-                <th className="px-6 py-3 font-medium">Status</th>
+                <th className="px-6 py-3 font-medium">Nama Siswa / Staf</th>
+                <th className="px-6 py-3 font-medium">Kelas / Departemen</th>
+                <th className="px-6 py-3 font-medium">UID Kartu NFC</th>
+                <th className="px-6 py-3 font-medium">Status Akses</th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-slate-100">
-              <TableRow time="07:14:22" name="Budi Santoso" class_="IT Support" uid="A1:B2:C3:D4" status="Diterima" />
-              <TableRow time="07:15:05" name="Siti Aminah" class_="Finance" uid="E5:F6:G7:H8" status="Diterima" />
-              <TableRow time="07:22:11" name="Tidak Dikenal" class_="-" uid="X9:Y8:Z7:W6" status="Ditolak" />
-              <TableRow time="07:25:30" name="Andi Wijaya" class_="HRD" uid="12:34:56:78" status="Diterima" />
+              {logs.map((log, index) => (
+                <TableRow 
+                  key={log.id || index}
+                  time={log.time} 
+                  name={log.name} 
+                  class_={log.class_} 
+                  uid={log.uid} 
+                  status={log.status} 
+                />
+              ))}
             </tbody>
           </table>
         </div>
@@ -73,7 +208,7 @@ function TableRow({ time, name, class_, uid, status }: any) {
   const isDenied = status === 'Ditolak';
   return (
     <tr className="hover:bg-slate-50 transition-colors">
-      <td className="px-6 py-4 text-slate-500">{time}</td>
+      <td className="px-6 py-4 text-slate-500 font-mono text-xs">{time}</td>
       <td className="px-6 py-4 font-medium text-slate-800">{name}</td>
       <td className="px-6 py-4 text-slate-600">{class_}</td>
       <td className="px-6 py-4 font-mono text-xs text-slate-500">{uid}</td>

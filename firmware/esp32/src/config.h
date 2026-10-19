@@ -27,15 +27,15 @@
 #define TIMEOUT_UNLOCKED_WAITING_MS 10000
 #define TIMEOUT_DOOR_OPEN_MS        30000
 
-// Wi-Fi
-#define WIFI_SSID "Your_WiFi_SSID"
-#define WIFI_PASSWORD "Your_WiFi_Password"
-#define WIFI_RETRY_INTERVAL_MS 5000 // Initial backoff interval
+// Wi-Fi (Use "Wokwi-GUEST" with empty password for Wokwi simulation)
+#define WIFI_SSID "Wokwi-GUEST"
+#define WIFI_PASSWORD ""
+#define WIFI_RETRY_INTERVAL_MS 5000
 
 // API Settings
 #define DEVICE_ID "GATE-01"
-#define API_URL "http://192.168.1.100:8000/api/attendance/tap"
-#define API_TOKEN "your_sanctum_token_here"
+#define API_URL "https://pjbl-website.vercel.app/api/attendance/tap"
+#define API_TOKEN "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkc21jaWZtbGJ3ZWp5aWhvcnFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyODQ4NzIsImV4cCI6MjEwNjg2MDg3Mn0.v2gNc9r0sFR9usBWaTcZhLNI_PKyb9XnMcG04ZHgqzU"
 
 // ==========================================
 // LOGGING CONVENTION

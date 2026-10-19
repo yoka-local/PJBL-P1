@@ -1,87 +1,249 @@
-import { Save, Smartphone, Wifi, Bell, ShieldCheck } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Save, Bell, ShieldCheck, Cpu, Sliders, Check, Radio } from 'lucide-react';
 
-export default function Settings() {
+interface SystemSettings {
+  doorUnlockDuration: number;
+  doorAjarTimeout: number;
+  tapCooldown: number;
+  telegramBotToken: string;
+  telegramChatId: string;
+  alertOnDenied: boolean;
+  alertOnDoorAjar: boolean;
+  supabaseEndpoint: string;
+  autoSyncInterval: number;
+}
+
+const DEFAULT_SETTINGS: SystemSettings = {
+  doorUnlockDuration: 4,
+  doorAjarTimeout: 15,
+  tapCooldown: 3,
+  telegramBotToken: '739281928:AAH9f2910kd0a...',
+  telegramChatId: '-100987654321',
+  alertOnDenied: true,
+  alertOnDoorAjar: true,
+  supabaseEndpoint: 'https://zdsmcifmlbwejyihorqs.supabase.co',
+  autoSyncInterval: 30,
+};
+
+export default function SettingsView() {
+  const [settings, setSettings] = useState<SystemSettings>(() => {
+    const saved = localStorage.getItem('nfckey_settings');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.warn('Failed to parse saved settings:', e);
+      }
+    }
+    return DEFAULT_SETTINGS;
+  });
+
+  const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    if (savedSuccess) {
+      const timer = setTimeout(() => setSavedSuccess(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [savedSuccess]);
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem('nfckey_settings', JSON.stringify(settings));
+    setSavedSuccess(true);
+  };
+
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800">Pengaturan & Perangkat</h2>
-        <p className="text-slate-500 mt-1">Konfigurasi perangkat ESP32 dan notifikasi Telegram.</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between pb-4 border-b border-[#d0d7de]">
+        <div>
+          <h2 className="text-xl font-semibold text-[#24292f] flex items-center gap-2">
+            <Sliders className="w-5 h-5 text-[#57606a]" />
+            System & Device Settings
+          </h2>
+          <p className="text-sm text-[#57606a] mt-1">
+            Configure ESP32 gate timings, Telegram instant alerts, and Supabase cloud sync parameters.
+          </p>
+        </div>
+
+        {savedSuccess && (
+          <div className="flex items-center gap-2 text-sm text-[#1a7f37] bg-[#dafbe1] border border-[#4ac26b66] px-3 py-1.5 rounded-md font-medium">
+            <Check className="w-4 h-4" /> Settings saved successfully
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Device Status */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-            <Smartphone className="w-5 h-5 text-slate-500" />
-            <h3 className="font-semibold text-slate-800">Status Perangkat (ESP32)</h3>
+      <form onSubmit={handleSave} className="space-y-6">
+        {/* Door Hardware Timings */}
+        <div className="border border-[#d0d7de] rounded-md overflow-hidden bg-white">
+          <div className="bg-[#f6f8fa] border-b border-[#d0d7de] px-4 py-3 flex items-center gap-2 text-sm font-semibold text-[#24292f]">
+            <ShieldCheck className="w-4 h-4 text-[#0969da]" />
+            Door Security & Actuator Parameters
           </div>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between py-2">
-              <span className="text-slate-500">Status Koneksi</span>
-              <span className="text-green-600 font-medium flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-green-500"></span> Online</span>
+          <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                Unlock Duration (Seconds)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="30"
+                value={settings.doorUnlockDuration}
+                onChange={(e) => setSettings({ ...settings, doorUnlockDuration: Number(e.target.value) })}
+                className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
+                required
+              />
+              <p className="text-xs text-[#57606a] mt-1">How long the 12V solenoid stays energized.</p>
             </div>
-            <div className="flex justify-between py-2">
-              <span className="text-slate-500">IP Address</span>
-              <span className="font-mono text-slate-700">192.168.1.45</span>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                Door Ajar Alarm Timeout (Seconds)
+              </label>
+              <input
+                type="number"
+                min="5"
+                max="120"
+                value={settings.doorAjarTimeout}
+                onChange={(e) => setSettings({ ...settings, doorAjarTimeout: Number(e.target.value) })}
+                className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
+                required
+              />
+              <p className="text-xs text-[#57606a] mt-1">Trigger buzzer alarm if door stays open past this limit.</p>
             </div>
-            <div className="flex justify-between py-2">
-              <span className="text-slate-500">Sisa Antrian Offline Sync</span>
-              <span className="font-mono text-slate-700">0 Data</span>
-            </div>
-            <div className="pt-4">
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
-                <Wifi className="w-4 h-4" /> Buka Captive Portal Wi-Fi
-              </button>
+
+            <div>
+              <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                Tap Cooldown (Seconds)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="60"
+                value={settings.tapCooldown}
+                onChange={(e) => setSettings({ ...settings, tapCooldown: Number(e.target.value) })}
+                className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
+                required
+              />
+              <p className="text-xs text-[#57606a] mt-1">Anti-bounce delay before reading the same NFC card again.</p>
             </div>
           </div>
         </div>
 
-        {/* Telegram Config */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-            <Bell className="w-5 h-5 text-slate-500" />
-            <h3 className="font-semibold text-slate-800">Notifikasi Telegram</h3>
+        {/* Telegram Alerts */}
+        <div className="border border-[#d0d7de] rounded-md overflow-hidden bg-white">
+          <div className="bg-[#f6f8fa] border-b border-[#d0d7de] px-4 py-3 flex items-center gap-2 text-sm font-semibold text-[#24292f]">
+            <Bell className="w-4 h-4 text-[#0969da]" />
+            Telegram Security Alerts (Bot API)
           </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Bot Token</label>
-              <input type="password" value="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ" readOnly className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 font-mono text-sm focus:outline-none" />
+          <div className="p-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                  Telegram Bot Token
+                </label>
+                <input
+                  type="text"
+                  value={settings.telegramBotToken}
+                  onChange={(e) => setSettings({ ...settings, telegramBotToken: e.target.value })}
+                  placeholder="e.g. 123456789:ABCdefGHIjkl..."
+                  className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm font-mono outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                  Telegram Chat ID / Channel ID
+                </label>
+                <input
+                  type="text"
+                  value={settings.telegramChatId}
+                  onChange={(e) => setSettings({ ...settings, telegramChatId: e.target.value })}
+                  placeholder="e.g. -100123456789"
+                  className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm font-mono outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Chat ID (Grup/Admin)</label>
-              <input type="text" defaultValue="-100987654321" className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-            </div>
-            <div className="pt-2">
-              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
-                <Save className="w-4 h-4" /> Simpan Pengaturan
-              </button>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-[#24292f]">
+                <input
+                  type="checkbox"
+                  checked={settings.alertOnDenied}
+                  onChange={(e) => setSettings({ ...settings, alertOnDenied: e.target.checked })}
+                  className="rounded text-[#0969da] focus:ring-[#0969da]"
+                />
+                Send alert on unauthorized tap (Kartu Ditolak)
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-[#24292f]">
+                <input
+                  type="checkbox"
+                  checked={settings.alertOnDoorAjar}
+                  onChange={(e) => setSettings({ ...settings, alertOnDoorAjar: e.target.checked })}
+                  className="rounded text-[#0969da] focus:ring-[#0969da]"
+                />
+                Send alert when door is held open (Door Ajar Alarm)
+              </label>
             </div>
           </div>
         </div>
 
-        {/* Security / System */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:col-span-2">
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-            <ShieldCheck className="w-5 h-5 text-slate-500" />
-            <h3 className="font-semibold text-slate-800">Keamanan & Akses Pintu</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Batas Waktu Tunggu Pintu (Detik)</label>
-              <p className="text-xs text-slate-500 mb-2">Berapa lama pintu tetap terbuka sebelum alarm menyala jika tidak ditutup.</p>
-              <input type="number" defaultValue="30" className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+        {/* Backend & Cloud Synchronization */}
+        <div className="border border-[#d0d7de] rounded-md overflow-hidden bg-white">
+          <div className="bg-[#f6f8fa] border-b border-[#d0d7de] px-4 py-3 flex items-center justify-between text-sm font-semibold text-[#24292f]">
+            <div className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-[#0969da]" />
+              Cloud Architecture & Backend Settings
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Cooldown Anti-Passback (Menit)</label>
-              <p className="text-xs text-slate-500 mb-2">Jeda waktu sebelum kartu yang sama bisa digunakan lagi.</p>
-              <input type="number" defaultValue="5" className="w-full px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#dafbe1] text-[#1a7f37] font-medium border border-[#4ac26b66] flex items-center gap-1">
+              <Radio className="w-3 h-3 animate-pulse" /> Fully Supabase Connected
+            </span>
+          </div>
+          <div className="p-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                  Supabase Project URL
+                </label>
+                <input
+                  type="text"
+                  value={settings.supabaseEndpoint}
+                  readOnly
+                  className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm font-mono bg-[#f6f8fa] text-[#57606a] cursor-not-allowed"
+                />
+                <p className="text-xs text-[#57606a] mt-1">Configured in .env as primary real-time database.</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                  Offline Sync Retry Interval (Seconds)
+                </label>
+                <input
+                  type="number"
+                  min="5"
+                  max="300"
+                  value={settings.autoSyncInterval}
+                  onChange={(e) => setSettings({ ...settings, autoSyncInterval: Number(e.target.value) })}
+                  className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
+                  required
+                />
+                <p className="text-xs text-[#57606a] mt-1">Interval for ESP32 background task to drain SPIFFS offline queue.</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            type="submit"
+            className="flex items-center gap-2 bg-[#2da44e] hover:bg-[#2c974b] text-white px-5 py-2 rounded-md font-medium text-sm transition-colors shadow-sm"
+          >
+            <Save className="w-4 h-4" /> Save Configuration
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
