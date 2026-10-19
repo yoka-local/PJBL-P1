@@ -57,14 +57,21 @@ export default function Cards() {
     };
 
     try {
-      await supabase.from('cards').insert([
+      const { data, error } = await supabase.from('cards').insert([
         {
           uid: newCard.uid,
           owner_name: newCard.owner,
           role: newCard.role,
           is_active: true,
         }
-      ]);
+      ]).select();
+
+      if (error) {
+        console.error('Error saving card to Supabase:', error);
+        alert('Gagal menyimpan kartu ke Supabase: ' + error.message);
+      } else if (data && data.length > 0) {
+        newCard.id = data[0].id;
+      }
     } catch (err) {
       console.warn('Local state fallback:', err);
     }

@@ -51,13 +51,20 @@ export default function Devices() {
     };
 
     try {
-      await supabase.from('devices').insert([
+      const { data, error } = await supabase.from('devices').insert([
         {
           device_id: newDevice.device_id,
           name: newDevice.name,
           status: 'offline',
         }
-      ]);
+      ]).select();
+
+      if (error) {
+        console.error('Error inserting device to Supabase:', error);
+        alert('Gagal mendaftarkan gateway ke Supabase: ' + error.message);
+      } else if (data && data.length > 0) {
+        newDevice.id = data[0].id;
+      }
     } catch (err) {
       console.warn('Error inserting device to Supabase:', err);
     }

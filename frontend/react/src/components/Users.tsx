@@ -57,14 +57,21 @@ export default function Users() {
     };
 
     try {
-      await supabase.from('users').insert([
+      const { data, error } = await supabase.from('users').insert([
         {
           name: newUser.name,
           department: newUser.dept,
           user_code: newUser.user_code,
           card_uid: newUser.card_uid,
         }
-      ]);
+      ]).select();
+
+      if (error) {
+        console.error('Error saving user to Supabase:', error);
+        alert('Gagal menyimpan user ke Supabase: ' + error.message);
+      } else if (data && data.length > 0) {
+        newUser.id = data[0].id;
+      }
     } catch (err) {
       console.warn('Error saving user to Supabase:', err);
     }
