@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { LayoutDashboard, Users as UsersIcon, CreditCard, Activity, Settings, Bell, ShieldCheck, Smartphone, Book } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Logs from './components/Logs';
@@ -14,6 +14,22 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userMenuOpen]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,21 +174,40 @@ function App() {
           <div className="relative">
             <Bell className="w-4 h-4 text-white cursor-pointer hover:text-[#c6cbd1] transition-colors" />
           </div>
-          <div className="flex items-center gap-2 cursor-pointer relative group">
-            <div className="w-5 h-5 bg-[#ffffff] rounded-full flex items-center justify-center text-[#24292f] font-bold text-xs overflow-hidden">
-               <img src={`https://avatars.githubusercontent.com/u/1?v=4`} alt="Avatar" className="w-full h-full object-cover" />
-            </div>
-            <span className="text-sm font-medium">▼</span>
+          <div ref={userMenuRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen((prev) => !prev)}
+              className="flex items-center gap-1.5 p-1 rounded-md hover:bg-[#32383f] transition-colors focus:outline-none cursor-pointer"
+              aria-expanded={userMenuOpen}
+              aria-label="User menu"
+            >
+              <div className="w-5 h-5 bg-[#ffffff] rounded-full flex items-center justify-center text-[#24292f] font-bold text-xs overflow-hidden">
+                <img src="https://avatars.githubusercontent.com/u/1?v=4" alt="Avatar" className="w-full h-full object-cover" />
+              </div>
+              <span className={`text-[10px] text-[#c6cbd1] transition-transform duration-150 ${userMenuOpen ? 'rotate-180 text-white' : ''}`}>▼</span>
+            </button>
             
             {/* Dropdown for logout */}
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg border border-[#d0d7de] hidden group-hover:block z-50">
-               <div className="px-4 py-2 border-b border-[#d0d7de] text-sm text-[#24292f]">
-                 Signed in as <br /> <strong className="font-semibold">{user.name}</strong>
-               </div>
-               <button onClick={logout} className="w-full text-left px-4 py-2 text-sm text-[#24292f] hover:bg-[#0969da] hover:text-white transition-colors">
-                 Sign out
-               </button>
-            </div>
+            {userMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-md shadow-xl border border-[#d0d7de] py-1 z-50">
+                <div className="px-4 py-2 border-b border-[#d0d7de] text-sm text-[#24292f]">
+                  Signed in as <br />
+                  <strong className="font-semibold block truncate" title={user.name}>{user.name}</strong>
+                  {user.email && <span className="text-xs text-[#57606a] block truncate">{user.email}</span>}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    logout();
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-[#cf222e] hover:bg-[#ffebe9] transition-colors font-medium flex items-center gap-2 cursor-pointer"
+                >
+                  Sign out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
