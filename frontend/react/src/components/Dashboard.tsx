@@ -19,10 +19,10 @@ const DEFAULT_LOGS: AttendanceLog[] = [
 ];
 
 export default function Dashboard() {
-  const [logs, setLogs] = useState<AttendanceLog[]>(DEFAULT_LOGS);
-  const [totalHadir, setTotalHadir] = useState<number>(342);
-  const [terlambat] = useState<number>(12);
-  const [kartuDitolak, setKartuDitolak] = useState<number>(3);
+  const [logs, setLogs] = useState<AttendanceLog[]>([]);
+  const [totalHadir, setTotalHadir] = useState<number>(0);
+  const [terlambat] = useState<number>(0);
+  const [kartuDitolak, setKartuDitolak] = useState<number>(0);
   const [doorStatus, setDoorStatus] = useState<'Terkunci' | 'Terbuka'>('Terkunci');
   const [isDeviceOnline, setIsDeviceOnline] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,7 +41,7 @@ export default function Dashboard() {
           const formattedLog: AttendanceLog = {
             id: newRow.id || newRow.event_id,
             time: new Date(newRow.timestamp || Date.now()).toLocaleTimeString('id-ID'),
-            name: newRow.user_name || 'Tamu / Siswa',
+            name: newRow.user_name || (newRow.status === 'Diterima' ? 'Siswa Terdaftar' : 'Kartu Asing'),
             class_: newRow.department || '-',
             uid: newRow.card_uid || '-',
             status: newRow.status === 'Diterima' ? 'Diterima' : 'Ditolak',
@@ -75,10 +75,10 @@ export default function Dashboard() {
         .order('timestamp', { ascending: false })
         .limit(10);
 
-      if (!error && attendanceData && attendanceData.length > 0) {
+      if (!error && attendanceData) {
         const formatted: AttendanceLog[] = attendanceData.map((row: any) => ({
           id: row.id || row.event_id,
-          time: new Date(row.timestamp).toLocaleTimeString('id-ID'),
+          time: new Date(row.timestamp || Date.now()).toLocaleTimeString('id-ID'),
           name: row.user_name || (row.status === 'Diterima' ? 'Siswa Terdaftar' : 'Kartu Asing'),
           class_: row.department || '-',
           uid: row.card_uid,
@@ -89,8 +89,8 @@ export default function Dashboard() {
         // Calculate dynamic stats
         const granted = attendanceData.filter((r: any) => r.status === 'Diterima').length;
         const denied = attendanceData.filter((r: any) => r.status === 'Ditolak').length;
-        setTotalHadir(granted > 0 ? granted : 342);
-        setKartuDitolak(denied > 0 ? denied : 3);
+        setTotalHadir(granted);
+        setKartuDitolak(denied);
       }
 
       // 2. Fetch Device Status
@@ -169,16 +169,24 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-slate-100">
-              {logs.map((log, index) => (
-                <TableRow 
-                  key={log.id || index}
-                  time={log.time} 
-                  name={log.name} 
-                  class_={log.class_} 
-                  uid={log.uid} 
-                  status={log.status} 
-                />
-              ))}
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                    Belum ada rekaman presensi di database Supabase. Tap kartu NFC pada ESP32 untuk mencatat presensi real-time.
+                  </td>
+                </tr>
+              ) : (
+                logs.map((log, index) => (
+                  <TableRow 
+                    key={log.id || index}
+                    time={log.time} 
+                    name={log.name} 
+                    class_={log.class_} 
+                    uid={log.uid} 
+                    status={log.status} 
+                  />
+                ))
+              )}
             </tbody>
           </table>
         </div>

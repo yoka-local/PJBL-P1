@@ -18,7 +18,7 @@ const DEFAULT_CARDS: CardItem[] = [
 ];
 
 export default function Cards() {
-  const [cards, setCards] = useState<CardItem[]>(DEFAULT_CARDS);
+  const [cards, setCards] = useState<CardItem[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [newUid, setNewUid] = useState<string>('');
   const [newOwner, setNewOwner] = useState<string>('');
@@ -36,7 +36,7 @@ export default function Cards() {
         .select('*')
         .order('id', { ascending: true });
 
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         setCards(data.map((c: any) => ({
           id: c.id,
           uid: c.uid,
@@ -124,7 +124,14 @@ export default function Cards() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {cards.map((card) => (
+        {cards.length === 0 ? (
+          <div className="col-span-full py-12 text-center bg-white rounded-xl border border-slate-200">
+            <CreditCard className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-600 font-medium">Belum ada kartu NFC terdaftar di database Supabase</p>
+            <p className="text-slate-400 text-sm mt-1">Klik tombol "Daftarkan Kartu" di atas untuk menambahkan kartu atau tag RFID baru.</p>
+          </div>
+        ) : (
+          cards.map((card) => (
           <div key={card.id || card.uid} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition">
             <div className="flex justify-between items-start mb-6">
               <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">

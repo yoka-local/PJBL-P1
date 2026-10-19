@@ -16,7 +16,7 @@ const DEFAULT_DEVICES: Device[] = [
 ];
 
 export default function Devices() {
-  const [devices, setDevices] = useState<Device[]>(DEFAULT_DEVICES);
+  const [devices, setDevices] = useState<Device[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [newDeviceId, setNewDeviceId] = useState('');
   const [newDeviceName, setNewDeviceName] = useState('');
@@ -34,7 +34,7 @@ export default function Devices() {
         .select('*')
         .order('id', { ascending: true });
 
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         setDevices(data);
       }
     } catch (error) {
@@ -116,7 +116,14 @@ export default function Devices() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {devices.map((device) => {
+        {devices.length === 0 ? (
+          <div className="col-span-full py-12 text-center bg-white rounded-xl border border-slate-200">
+            <Smartphone className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-600 font-medium">Belum ada perangkat gateway ESP32 terdaftar di database</p>
+            <p className="text-slate-400 text-sm mt-1">Klik tombol "Tambah Gateway" di atas untuk mendaftarkan modul ESP32 baru.</p>
+          </div>
+        ) : (
+          devices.map((device) => {
           const isOnline = device.status === 'online';
           return (
             <div key={device.id} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">

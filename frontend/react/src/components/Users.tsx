@@ -18,7 +18,7 @@ const DEFAULT_USERS: UserItem[] = [
 ];
 
 export default function Users() {
-  const [users, setUsers] = useState<UserItem[]>(DEFAULT_USERS);
+  const [users, setUsers] = useState<UserItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [dept, setDept] = useState('');
@@ -36,7 +36,7 @@ export default function Users() {
         .select('*')
         .order('id', { ascending: true });
 
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         setUsers(data.map((u: any, i: number) => ({
           id: u.id,
           user_code: u.user_code || `EMP-${100 + (i + 1)}`,
@@ -122,7 +122,14 @@ export default function Users() {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-slate-100">
-              {users.map((user) => (
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                    Belum ada data siswa / pengguna terdaftar di database Supabase. Klik "Tambah Pengguna" di atas untuk mendaftarkan.
+                  </td>
+                </tr>
+              ) : (
+                users.map((user) => (
                 <tr key={user.id || user.user_code} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-mono text-xs text-slate-500">{user.user_code}</td>
                   <td className="px-6 py-4 font-medium text-slate-800">{user.name}</td>

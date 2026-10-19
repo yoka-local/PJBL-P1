@@ -20,7 +20,7 @@ const DEFAULT_LOGS: LogItem[] = [
 ];
 
 export default function Logs() {
-  const [logs, setLogs] = useState<LogItem[]>(DEFAULT_LOGS);
+  const [logs, setLogs] = useState<LogItem[]>([]);
   const [search, setSearch] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [loading, setLoading] = useState<boolean>(false);
@@ -38,7 +38,7 @@ export default function Logs() {
         .order('timestamp', { ascending: false })
         .limit(50);
 
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         setLogs(data.map((r: any) => ({
           id: r.id,
           event_id: r.event_id || `EVT-${r.id}`,
