@@ -44,6 +44,9 @@ export default function SettingsView() {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  const [testingTelegram, setTestingTelegram] = useState(false);
+  const [testResult, setTestResult] = useState<string | null>(null);
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -105,6 +108,29 @@ export default function SettingsView() {
       setSaveError(err.message || 'Gagal menyimpan pengaturan ke cloud Supabase');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleTestTelegram = async () => {
+    if (!settings.telegramBotToken.trim() || !settings.telegramChatId.trim()) {
+      setTestResult('⚠️ Masukkan Bot Token dan Chat ID terlebih dahulu.');
+      return;
+    }
+    setTestingTelegram(true);
+    setTestResult(null);
+    try {
+      const text = encodeURIComponent('🔔 [NFCKey System] Uji coba notifikasi bot Telegram berhasil! Sistem keamanan aktif.');
+      const res = await fetch(`https://api.telegram.org/bot${settings.telegramBotToken.trim()}/sendMessage?chat_id=${settings.telegramChatId.trim()}&text=${text}`);
+      const data = await res.json();
+      if (data.ok) {
+        setTestResult('✅ Pesan uji coba berhasil dikirim ke Telegram!');
+      } else {
+        setTestResult(`❌ Gagal kirim: ${data.description || 'Token/Chat ID salah'}`);
+      }
+    } catch (err: any) {
+      setTestResult(`❌ Gagal koneksi: ${err.message}`);
+    } finally {
+      setTestingTelegram(false);
     }
   };
 
@@ -261,6 +287,24 @@ export default function SettingsView() {
                 />
                 Send alert when door is held open (Door Ajar Alarm)
               </label>
+            </div>
+
+            <div className="pt-3 border-t border-[#d0d7de] flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={handleTestTelegram}
+                disabled={testingTelegram}
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-[#d0d7de] rounded-md text-xs font-semibold text-[#24292f] bg-[#f6f8fa] hover:bg-[#eaeef2] transition cursor-pointer disabled:opacity-50"
+              >
+                <Bell className={`w-3.5 h-3.5 ${testingTelegram ? 'animate-bounce text-[#0969da]' : 'text-[#0969da]'}`} />
+                {testingTelegram ? 'Mengirim pesan uji coba...' : 'Test Kirim Alert Telegram'}
+              </button>
+
+              {testResult && (
+                <span className="text-xs font-medium text-[#24292f]">
+                  {testResult}
+                </span>
+              )}
             </div>
           </div>
         </div>

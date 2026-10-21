@@ -23,7 +23,6 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (credentials: any) => Promise<void>;
-  quickLogin: () => Promise<void>;
   forgetRememberedUser: () => void;
   rememberedUser: RememberedUser | null;
   logout: () => void;
@@ -56,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: (session.user.user_metadata?.role as any) || 'admin',
           department: session.user.user_metadata?.department || 'IT Operations',
         });
+      } else {
+        setUser(null);
       }
     });
 
@@ -76,13 +77,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           department: session.user.user_metadata?.department || 'IT Operations',
         });
       } else {
-        const storedDemo = localStorage.getItem('demo_auth');
-        if (storedDemo) {
-          setUser(JSON.parse(storedDemo));
-        }
+        setUser(null);
       }
     } catch (err) {
-      console.warn('Session check fallback:', err);
+      console.warn('Session check:', err);
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -91,6 +90,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (credentials: any) => {
     const email = (credentials.email || '').trim().toLowerCase();
     const password = (credentials.password || '').trim();
+
+    if (!email || !password) {
+      throw new Error('Email dan password wajib diisi.');
+    }
 
     const saveRemembered = (u: User) => {
       try {
@@ -109,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // 1. Try Supabase Auth
+    // 1. Authenticate against Supabase Auth (GoTrue)
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -129,10 +132,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
     } catch (supabaseErr) {
-      console.warn('Supabase Auth error, checking demo admin credentials:', supabaseErr);
+      console.warn('Supabase Auth attempt:', supabaseErr);
     }
 
-    // 2. Query public.users table in Supabase directly
+    // 2. Strict Fallback: Check public.users table in Supabase
     try {
       const { data: dbUsers, error: dbError } = await supabase
         .from('users')
@@ -142,7 +145,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!dbError && dbUsers && dbUsers.length > 0) {
         const dbUser = dbUsers[0];
-        if (dbUser.password === password || password === 'yorushika' || email.includes('admin') || email.includes('gopyl')) {
+        // STRICT: User password must strictly equal the provided password!
+        if (dbUser.password && dbUser.password === password) {
           const authUser: User = {
             id: dbUser.id,
             name: dbUser.name || 'Admin User',
@@ -150,54 +154,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             role: (dbUser.role as any) || 'admin',
             department: dbUser.department || 'IT Operations',
           };
-          localStorage.setItem('demo_auth', JSON.stringify(authUser));
           saveRemembered(authUser);
           setUser(authUser);
           return;
         }
       }
     } catch (dbErr) {
-      console.warn('Error checking public.users table:', dbErr);
+      console.warn('Database user check error:', dbErr);
     }
 
-    // 3. Default Demo Admin Fallback for offline or local demo
-    if (
-      email === 'gopyl@proton.me' ||
-      email.includes('gopyl') ||
-      email === 'admin@nfckey.com' || 
-      email === 'admin@example.com' || 
-      email.includes('admin') ||
-      password === 'yorushika'
-    ) {
-      const demoUser: User = {
-        id: 1,
-        name: email.includes('gopyl') ? 'Admin User (gopyl)' : 'Administrator (PJBL Kelompok)',
-        email: email || 'gopyl@proton.me',
-        role: 'admin',
-        department: 'Sistem Keamanan & Presensi',
-      };
-      localStorage.setItem('demo_auth', JSON.stringify(demoUser));
-      saveRemembered(demoUser);
-      setUser(demoUser);
-      return;
-    }
-
-    throw new Error('Email atau password tidak sesuai.');
-  };
-
-  const quickLogin = async () => {
-    if (!rememberedUser) {
-      throw new Error('Tidak ada akun tersimpan di browser ini.');
-    }
-    const authUser: User = {
-      id: rememberedUser.id,
-      name: rememberedUser.name,
-      email: rememberedUser.email,
-      role: rememberedUser.role,
-      department: rememberedUser.department,
-    };
-    localStorage.setItem('demo_auth', JSON.stringify(authUser));
-    setUser(authUser);
+    // Neither matches: Strictly reject login!
+    throw new Error('Email atau password salah. Silakan periksa kembali kredensial Anda.');
   };
 
   const forgetRememberedUser = () => {
@@ -221,7 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, quickLogin, forgetRememberedUser, rememberedUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, forgetRememberedUser, rememberedUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
