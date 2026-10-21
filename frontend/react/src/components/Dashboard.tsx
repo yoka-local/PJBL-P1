@@ -17,9 +17,34 @@ export default function Dashboard() {
   const [totalCards, setTotalCards] = useState<number>(0);
   const [kartuDitolak, setKartuDitolak] = useState<number>(0);
   const [doorStatus, setDoorStatus] = useState<'Terkunci' | 'Terbuka'>('Terkunci');
-  const [isDeviceOnline, setIsDeviceOnline] = useState<boolean>(true);
+  const [isDeviceOnline, setIsDeviceOnline] = useState<boolean>(false);
   const [deviceName, setDeviceName] = useState<string>('GATE-01');
+  const [deviceRaw, setDeviceRaw] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const checkDeviceLiveness = (dev: any): boolean => {
+    if (!dev || !dev.last_seen) return false;
+    const dateStr = dev.last_seen.endsWith('Z') ? dev.last_seen : dev.last_seen + 'Z';
+    const lastSeenMs = new Date(dateStr).getTime();
+    if (isNaN(lastSeenMs)) return false;
+    const diffSeconds = (Date.now() - lastSeenMs) / 1000;
+    // Considered online if last seen was within 45 seconds AND status is online
+    return diffSeconds < 45 && dev.status === 'online';
+  };
+
+  // Re-check liveness every 5 seconds so status transitions to offline automatically
+  useEffect(() => {
+    const updateLiveness = () => {
+      if (deviceRaw) {
+        setIsDeviceOnline(checkDeviceLiveness(deviceRaw));
+      } else {
+        setIsDeviceOnline(false);
+      }
+    };
+    updateLiveness();
+    const timer = setInterval(updateLiveness, 5000);
+    return () => clearInterval(timer);
+  }, [deviceRaw]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -62,7 +87,8 @@ export default function Dashboard() {
         { event: '*', schema: 'public', table: 'devices' },
         (payload: any) => {
           if (payload.new) {
-            setIsDeviceOnline(payload.new.status === 'online');
+            setDeviceRaw(payload.new);
+            setIsDeviceOnline(checkDeviceLiveness(payload.new));
             if (payload.new.device_id) {
               setDeviceName(payload.new.device_id);
             }
@@ -123,8 +149,11 @@ export default function Dashboard() {
         .limit(1);
 
       if (deviceData && deviceData.length > 0) {
-        setIsDeviceOnline(deviceData[0].status === 'online');
+        setDeviceRaw(deviceData[0]);
         setDeviceName(deviceData[0].device_id || 'GATE-01');
+        setIsDeviceOnline(checkDeviceLiveness(deviceData[0]));
+      } else {
+        setIsDeviceOnline(false);
       }
     } catch (err) {
       console.warn('Dashboard fetch fallback:', err);

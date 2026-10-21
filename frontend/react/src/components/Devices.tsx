@@ -17,9 +17,22 @@ export default function Devices() {
   const [newDeviceName, setNewDeviceName] = useState('');
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [, setTick] = useState(0);
+
+  const checkDeviceLiveness = (dev: Device): boolean => {
+    if (!dev || !dev.last_seen) return false;
+    const dateStr = dev.last_seen.endsWith('Z') ? dev.last_seen : dev.last_seen + 'Z';
+    const lastSeenMs = new Date(dateStr).getTime();
+    if (isNaN(lastSeenMs)) return false;
+    const diffSeconds = (Date.now() - lastSeenMs) / 1000;
+    return diffSeconds < 45 && dev.status === 'online';
+  };
 
   useEffect(() => {
     fetchDevices();
+
+    // Re-check liveness every 5 seconds so badge updates automatically
+    const timer = setInterval(() => setTick((t) => t + 1), 5000);
 
     // Supabase Realtime Subscription for Devices
     const channel = supabase
@@ -34,6 +47,7 @@ export default function Devices() {
       .subscribe();
 
     return () => {
+      clearInterval(timer);
       supabase.removeChannel(channel);
     };
   }, []);
@@ -156,7 +170,7 @@ export default function Devices() {
           </div>
         ) : (
           devices.map((device) => {
-          const isOnline = device.status === 'online';
+          const isOnline = checkDeviceLiveness(device);
           return (
             <div key={device.id} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
               <div>
@@ -171,8 +185,9 @@ export default function Devices() {
                     </div>
                   </div>
                   <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                    isOnline ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+                    isOnline ? 'bg-green-100 text-green-700 font-semibold flex items-center gap-1.5' : 'bg-slate-100 text-slate-500'
                   }`}>
+                    {isOnline && <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>}
                     {isOnline ? 'Online' : 'Offline'}
                   </span>
                 </div>
@@ -181,7 +196,9 @@ export default function Devices() {
                   <div className="flex justify-between">
                     <span>Terakhir Terlihat:</span>
                     <span className="font-medium text-slate-700">
-                      {device.last_seen ? new Date(device.last_seen).toLocaleTimeString('id-ID') : 'Belum Pernah'}
+                      {device.last_seen 
+                        ? new Date(device.last_seen.endsWith('Z') ? device.last_seen : device.last_seen + 'Z').toLocaleString('id-ID') 
+                        : 'Belum Pernah'}
                     </span>
                   </div>
                   <div className="flex justify-between">

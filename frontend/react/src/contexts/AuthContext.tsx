@@ -117,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: dbUsers, error: dbError } = await supabase
         .from('users')
         .select('*')
-        .eq('email', email)
+        .ilike('email', email)
         .limit(1);
 
       if (!dbError && dbUsers && dbUsers.length > 0) {

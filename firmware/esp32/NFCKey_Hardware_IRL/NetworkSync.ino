@@ -122,3 +122,28 @@ void sync_update() {
 
     http.end();
 }
+
+// ============================================================================
+// HEARTBEAT PING (Kirim status aktif berkala ke Supabase agar Dashboard Realtime)
+// ============================================================================
+static unsigned long lastHeartbeat = 0;
+
+void heartbeat_update() {
+    if (WiFi.status() != WL_CONNECTED) return;
+    if (millis() - lastHeartbeat < 20000 && lastHeartbeat != 0) return;
+
+    lastHeartbeat = millis();
+
+    HTTPClient http;
+    String url = String(SUPABASE_URL) + "/rest/v1/devices?device_id=eq." + String(DEVICE_ID);
+    http.begin(url);
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("apikey", SUPABASE_KEY);
+    http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+
+    int httpResponseCode = http.sendRequest("PATCH", "{\"status\":\"online\"}");
+    if (httpResponseCode > 0) {
+        Serial.printf("[HEARTBEAT] Ping Supabase Aktif (HTTP %d)\n", httpResponseCode);
+    }
+    http.end();
+}

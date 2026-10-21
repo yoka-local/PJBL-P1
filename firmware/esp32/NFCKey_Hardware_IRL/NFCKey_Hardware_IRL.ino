@@ -65,4 +65,7 @@ void loop() {
 
     // 4. Sinkronisasi antrean log ke database Supabase
     sync_update();
+
+    // 5. Heartbeat status gateway ke Supabase
+    heartbeat_update();
 }
