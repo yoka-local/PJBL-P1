@@ -112,7 +112,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // 1. Authenticate against Supabase Auth (GoTrue)
+    // 1. Check public.users table in Supabase first (Database source of truth)
+    try {
+      const { data: dbUsers, error: dbError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .limit(1);
+
+      if (!dbError && dbUsers && dbUsers.length > 0) {
+        const dbUser = dbUsers[0];
+        // If password is set in public.users, enforce exact match
+        if (dbUser.password) {
+          if (dbUser.password !== password) {
+            throw new Error('Email atau password salah. Silakan periksa kembali kredensial Anda.');
+          }
+
+          // Password matched! Try signing in to Supabase Auth to establish session
+          try {
+            await supabase.auth.signInWithPassword({ email, password });
+          } catch {
+            // background session failure is non-fatal
+          }
+
+          const authUser: User = {
+            id: dbUser.id,
+            name: dbUser.name || 'Admin User',
+            email: dbUser.email,
+            role: (dbUser.role as any) || 'admin',
+            department: dbUser.department || 'IT Operations',
+          };
+          saveRemembered(authUser);
+          setUser(authUser);
+          return;
+        }
+      }
+    } catch (err: any) {
+      if (err.message && err.message.includes('Email atau password salah')) {
+        throw err;
+      }
+      console.warn('Database user check error:', err);
+    }
+
+    // 2. Fallback: Authenticate against Supabase Auth directly
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -135,35 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.warn('Supabase Auth attempt:', supabaseErr);
     }
 
-    // 2. Strict Fallback: Check public.users table in Supabase
-    try {
-      const { data: dbUsers, error: dbError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .limit(1);
-
-      if (!dbError && dbUsers && dbUsers.length > 0) {
-        const dbUser = dbUsers[0];
-        // STRICT: User password must strictly equal the provided password!
-        if (dbUser.password && dbUser.password === password) {
-          const authUser: User = {
-            id: dbUser.id,
-            name: dbUser.name || 'Admin User',
-            email: dbUser.email,
-            role: (dbUser.role as any) || 'admin',
-            department: dbUser.department || 'IT Operations',
-          };
-          saveRemembered(authUser);
-          setUser(authUser);
-          return;
-        }
-      }
-    } catch (dbErr) {
-      console.warn('Database user check error:', dbErr);
-    }
-
-    // Neither matches: Strictly reject login!
+    // Strictly reject login if credentials do not match
     throw new Error('Email atau password salah. Silakan periksa kembali kredensial Anda.');
   };
 
