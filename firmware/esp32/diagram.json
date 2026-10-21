@@ -3,54 +3,134 @@
   "author": "NFCKey Team",
   "editor": "wokwi",
   "parts": [
-    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 50, "left": 0, "attrs": {} },
+    { 
+      "type": "board-esp32-devkit-c-v4", 
+      "id": "esp", 
+      "top": 100, 
+      "left": 0, 
+      "attrs": {} 
+    },
     {
       "type": "board-mfrc522",
       "id": "rfid",
-      "top": 35,
-      "left": 240,
+      "top": 90,
+      "left": 300,
       "attrs": { "uid": "04:a3:92:7f" }
     },
-    { "type": "wokwi-resistor", "id": "r_green", "top": 90, "left": -90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_green", "top": 90, "left": -180, "attrs": { "color": "green", "label": "GRN (Granted)" } },
-    { "type": "wokwi-resistor", "id": "r_red", "top": 140, "left": -90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_red", "top": 140, "left": -180, "attrs": { "color": "red", "label": "RED (Denied)" } },
-    { "type": "wokwi-resistor", "id": "r_yellow", "top": 190, "left": -90, "attrs": { "value": "220" } },
-    { "type": "wokwi-led", "id": "led_yellow", "top": 190, "left": -180, "attrs": { "color": "yellow", "label": "YEL (Ajar)" } },
-    { "type": "wokwi-slide-switch", "id": "reed", "top": 245, "left": -170, "attrs": {} },
-    { "type": "wokwi-buzzer", "id": "buzzer", "top": 295, "left": -170, "attrs": { "volume": "0.3" } },
-    { "type": "wokwi-relay-module", "id": "relay", "top": 360, "left": -180, "rotate": 180, "attrs": { "rotate": 180 } }
+    { 
+      "type": "wokwi-resistor", 
+      "id": "r_green", 
+      "top": 90, 
+      "left": -100, 
+      "attrs": { "value": "220" } 
+    },
+    { 
+      "type": "wokwi-led", 
+      "id": "led_green", 
+      "top": 80, 
+      "left": -200, 
+      "attrs": { "color": "green", "label": "AKSES DITERIMA (HIJAU)" } 
+    },
+    { 
+      "type": "wokwi-resistor", 
+      "id": "r_red", 
+      "top": 145, 
+      "left": -100, 
+      "attrs": { "value": "220" } 
+    },
+    { 
+      "type": "wokwi-led", 
+      "id": "led_red", 
+      "top": 135, 
+      "left": -200, 
+      "attrs": { "color": "red", "label": "AKSES DITOLAK (MERAH)" } 
+    },
+    { 
+      "type": "wokwi-resistor", 
+      "id": "r_yellow", 
+      "top": 200, 
+      "left": -100, 
+      "attrs": { "value": "220" } 
+    },
+    { 
+      "type": "wokwi-led", 
+      "id": "led_yellow", 
+      "top": 190, 
+      "left": -200, 
+      "attrs": { "color": "yellow", "label": "ALARM PINTU TERBUKA (KUNING)" } 
+    },
+    { 
+      "type": "wokwi-slide-switch", 
+      "id": "reed", 
+      "top": 255, 
+      "left": -190, 
+      "attrs": { "label": "SENSOR MAGNET (REED SWITCH)" } 
+    },
+    { 
+      "type": "wokwi-buzzer", 
+      "id": "buzzer", 
+      "top": 320, 
+      "left": -190, 
+      "attrs": { "volume": "0.3", "label": "BUZZER 5V" } 
+    },
+    { 
+      "type": "wokwi-relay-module", 
+      "id": "relay", 
+      "top": 395, 
+      "left": -190, 
+      "rotate": 180, 
+      "attrs": { "rotate": 180, "label": "MODUL RELAY 5V" } 
+    },
+    { 
+      "type": "wokwi-resistor", 
+      "id": "r_solenoid", 
+      "top": 405, 
+      "left": -270, 
+      "attrs": { "value": "220" } 
+    },
+    { 
+      "type": "wokwi-led", 
+      "id": "led_solenoid", 
+      "top": 395, 
+      "left": -360, 
+      "attrs": { "color": "blue", "label": "SOLENOID LOCK (TERBUKA)" } 
+    }
   ],
   "connections": [
-    [ "esp:5", "rfid:SDA", "blue", [ "h25", "v-100", "h65" ] ],
-    [ "esp:18", "rfid:SCK", "orange", [ "h40", "v-75", "h50" ] ],
-    [ "esp:19", "rfid:MISO", "purple", [ "h55", "v-35", "h35" ] ],
-    [ "esp:23", "rfid:MOSI", "green", [ "h70", "v10", "h20" ] ],
-    [ "esp:22", "rfid:RST", "gray", [ "h85", "v60", "h5" ] ],
-    [ "esp:GND.2", "rfid:GND", "black", [ "h100", "v65", "h-10" ] ],
-    [ "esp:3V3", "rfid:3.3V", "red", [ "h-20", "v-55", "h335", "v145" ] ],
+    [ "esp:3V3", "rfid:3.3V", "red", [ "v-45", "h340", "v35" ] ],
+    [ "esp:GND.2", "rfid:GND", "black", [ "h35", "v30", "h130" ] ],
+    [ "esp:22", "rfid:RST", "gray", [ "h50", "v-15", "h115" ] ],
+    [ "esp:23", "rfid:MOSI", "green", [ "h65", "v60", "h100" ] ],
+    [ "esp:19", "rfid:MISO", "purple", [ "h80", "v-35", "h85" ] ],
+    [ "esp:18", "rfid:SCK", "orange", [ "h95", "v-5", "h70" ] ],
+    [ "esp:5", "rfid:SDA", "blue", [ "h110", "v0", "h55" ] ],
 
-    [ "esp:32", "r_green:2", "green", [ "h-15" ] ],
-    [ "r_green:1", "led_green:A", "green", [ "h-20" ] ],
-    [ "led_green:C", "esp:GND.1", "black", [ "h-20", "v90", "h90" ] ],
+    [ "esp:32", "r_green:2", "green", [ "h-20", "v-105", "h-20" ] ],
+    [ "r_green:1", "led_green:A", "green", [ "h-25" ] ],
+    [ "led_green:C", "esp:GND.1", "black", [ "v30", "h130", "v170" ] ],
 
-    [ "esp:33", "r_red:2", "red", [ "h-15" ] ],
-    [ "r_red:1", "led_red:A", "red", [ "h-20" ] ],
-    [ "led_red:C", "esp:GND.1", "black", [ "h-30", "v50", "h100" ] ],
+    [ "esp:33", "r_red:2", "firebrick", [ "h-35", "v-65", "h-15" ] ],
+    [ "r_red:1", "led_red:A", "firebrick", [ "h-25" ] ],
+    [ "led_red:C", "esp:GND.1", "black", [ "v45", "h120", "v105" ] ],
 
-    [ "esp:25", "r_yellow:2", "gold", [ "h-15" ] ],
-    [ "r_yellow:1", "led_yellow:A", "gold", [ "h-20" ] ],
-    [ "led_yellow:C", "esp:GND.1", "black", [ "h-40", "v10", "h110" ] ],
+    [ "esp:25", "r_yellow:2", "gold", [ "h-50", "v-20", "h-10" ] ],
+    [ "r_yellow:1", "led_yellow:A", "gold", [ "h-25" ] ],
+    [ "led_yellow:C", "esp:GND.1", "black", [ "v60", "h110", "v40" ] ],
 
-    [ "esp:27", "reed:2", "cyan", [ "h-40" ] ],
-    [ "reed:1", "esp:GND.1", "black", [ "h-30", "v-45", "h100" ] ],
+    [ "esp:27", "reed:2", "cyan", [ "h-65", "v5", "h-25" ] ],
+    [ "reed:1", "esp:GND.1", "black", [ "h20", "v15", "h65" ] ],
 
-    [ "esp:14", "buzzer:2", "yellow", [ "h-40" ] ],
-    [ "buzzer:1", "esp:GND.1", "black", [ "h-20", "v-85", "h90" ] ],
+    [ "esp:14", "buzzer:2", "yellow", [ "h-50", "v60", "h-30" ] ],
+    [ "buzzer:1", "esp:GND.1", "black", [ "h35", "v-25", "h50" ] ],
 
-    [ "esp:26", "relay:IN", "blue", [ "h-50", "v165", "h-15" ] ],
-    [ "esp:GND.1", "relay:GND", "black", [ "h-40", "v135", "h-25" ] ],
-    [ "esp:5V", "relay:VCC", "red", [ "h-30", "v105", "h-35" ] ]
+    [ "esp:26", "relay:IN", "blue", [ "h-35", "v165", "h-30" ] ],
+    [ "esp:GND.1", "relay:GND", "black", [ "h-20", "v105", "h-45" ] ],
+    [ "esp:5V", "relay:VCC", "red", [ "h-35", "v35", "h-30" ] ],
+
+    [ "esp:5V", "relay:COM", "red", [ "h-50", "v75", "h-150" ] ],
+    [ "relay:NO", "r_solenoid:2", "blue", [ "h-15" ] ],
+    [ "r_solenoid:1", "led_solenoid:A", "blue", [ "h-20" ] ],
+    [ "led_solenoid:C", "esp:GND.1", "black", [ "v30", "h240", "v-130" ] ]
   ],
   "dependencies": {}
 }

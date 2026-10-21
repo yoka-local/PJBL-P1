@@ -1,77 +1,80 @@
-# NFCKey ESP32 Wokwi Simulator Setup
+# NFCKey ESP32 - Panduan Wokwi Simulator Setup
 
-This directory contains everything needed to run a 100% interactive, hardware-accurate simulation of the NFCKey ESP32 firmware on **[Wokwi](https://wokwi.com)**.
-
-## Components Simulated
-
-| Component | Pin | Purpose |
-|---|---|---|
-| **ESP32 DevKit v4** | - | Main controller |
-| **MFRC522 RFID** | SS=5, SCK=18, MOSI=23, MISO=19, RST=22 | Card / Badge Reader (SPI) |
-| **Relay Module** | GPIO 26 | Electronic Door Solenoid / Lock |
-| **Slide Switch** | GPIO 27 (Input Pull-up) | Reed Switch (Door Contact Sensor) |
-| **Piezo Buzzer** | GPIO 14 | Sound effects (Success, Denied, Alarm) |
-| **Green LED** | GPIO 32 | Access Granted Indicator |
-| **Red LED** | GPIO 33 | Access Denied / Tamper Indicator |
-| **Yellow LED** | GPIO 25 | Door Ajar Warning Indicator |
+Direktori ini berisi seluruh konfigurasi yang dibutuhkan untuk menjalankan simulasi interaktif perangkat keras **NFCKey ESP32** secara akurat dan bersih di **[Wokwi Simulator](https://wokwi.com)**.
 
 ---
 
-## Method 1: Web Simulator (Zero Installation)
+## 1. Daftar Komponen yang Disimulasikan
 
-1. Open your browser and navigate to **[wokwi.com](https://wokwi.com)**.
-2. Select **ESP32** (or "Start from Scratch" -> ESP32).
-3. **Libraries**:
-   - Click the **Library Manager** tab (or the little library icon).
-   - Add `MFRC522` and `ArduinoJson`.
-4. **Hardware Wiring (`diagram.json`)**:
-   - Click the `diagram.json` tab.
-   - Paste the contents of [`diagram.json`](diagram.json).
-5. **Firmware Code (`sketch.ino`)**:
-   - Click the `sketch.ino` tab.
-   - Paste the entire code from [`wokwi_sketch.ino`](wokwi_sketch.ino).
-6. **Run**:
-   - Click the green **Play / Start Simulation** button.
+| Komponen | Identitas / Pin | Fungsi & Keterangan |
+| :--- | :--- | :--- |
+| **ESP32 DevKit v4** | `esp` | Mikrokontroler utama |
+| **RFID Reader MFRC522** | `rfid` (SS=5, SCK=18, MOSI=23, MISO=19, RST=22, 3.3V) | Pembaca kartu NFC/RFID (SPI Bus) |
+| **Modul Relay 5V** | `relay` (IN=GPIO 26, VCC=5V, GND=GND) | Pengendali saklar daya solenoid pintu |
+| **Indikator Solenoid Lock** | `led_solenoid` (Biru) + `r_solenoid` (220 $\Omega$) | Meniru solenoid lock fisik (menyala saat relay terbuka) |
+| **LED Hijau (Akses Diterima)** | `led_green` + `r_green` (220 $\Omega$, GPIO 32) | Indikator visual kartu terdaftar |
+| **LED Merah (Akses Ditolak)** | `led_red` + `r_red` (220 $\Omega$, GPIO 33) | Indikator visual kartu ditolak / alarm |
+| **LED Kuning (Pintu Terbuka)** | `led_yellow` + `r_yellow` (220 $\Omega$, GPIO 25) | Indikator peringatan pintu terbuka terlalu lama |
+| **Sensor Magnet Pintu (Reed Switch)** | `reed` (Slide Switch, GPIO 27, INPUT_PULLUP) | Meniru kontak magnet kusen pintu |
+| **Piezo Buzzer 5V** | `buzzer` (GPIO 14) | Audio feedback nada sukses, ditolak, dan sirene alarm |
 
----
-
-## Method 2: VS Code Extension
-
-1. Install the **Wokwi Simulator** extension in VS Code.
-2. Ensure `firmware/esp32/wokwi.toml` and `firmware/esp32/diagram.json` are present in your workspace.
-3. Open `diagram.json` in VS Code and press `F1` -> `Wokwi: Start Simulator`.
+> [!NOTE]
+> Seluruh LED dilengkapi dengan **resistor 220 $\Omega$** untuk memenuhi kaidah elektronika standar dan menjaga kabel tetap rapi serta mudah dibaca.
 
 ---
 
-## Testing & Interacting with the Simulator
+## 2. Cara Menjalankan di Wokwi Web (wokwi.com)
 
-### 1. Valid Card (Access Granted)
-- Click on the **MFRC522 module** in the simulator preview.
-- By default, the **Blue Card** is configured with UID `04:A3:92:7F` (or select the **Green Card** with UID `11:22:33:44`).
-- **Result:**
-  - Relay clicks ON.
-  - Green LED lights up.
-  - Success chirp sounds on buzzer.
-  - Event is created and uploaded to the API endpoint over virtual Wi-Fi (`Wokwi-GUEST`).
+1. Buka browser dan kunjungi **[wokwi.com](https://wokwi.com)**.
+2. Pilih **ESP32** (atau "Start from Scratch" -> ESP32).
+3. **Pasang Library**:
+   - Klik ikon **Library Manager** (tab kedua di panel kode).
+   - Tambahkan library: **`MFRC522`**.
+4. **Salin Skema Kabel (`diagram.json`)**:
+   - Buka tab `diagram.json`.
+   - Timpa seluruh isinya dengan kode dari file [`diagram.json`](diagram.json).
+5. **Salin Kode Firmware (`sketch.ino`)**:
+   - Buka tab `sketch.ino`.
+   - Timpa seluruh isinya dengan kode dari file [`wokwi_sketch.ino`](wokwi_sketch.ino).
+6. **Mulai Simulasi**:
+   - Klik tombol hijau **Play / Start Simulation**.
 
-### 2. Invalid Card (Access Denied)
-- Click on the MFRC522 and choose the **Red Card** (UID `AA:BB:CC:DD`).
-- **Result:**
-  - Red LED illuminates.
-  - Low angry error beep sounds.
-  - Relay remains locked.
+---
 
-### 3. Door Open & Close Cycle
-- After a valid card tap, flip the **Slide Switch** (Reed Switch on GPIO 27) away from GND to simulate opening the door.
-- Flip the switch back to simulate the door closing.
-- **Result:** The relay immediately locks and status returns to `LOCKED`.
+## 3. Cara Menjalankan di VS Code Extension (Wokwi)
 
-### 4. Auto-Relock Timeout (Door Never Opened)
-- Tap a valid card, but do NOT flip the slide switch.
-- Wait **10 seconds**.
-- **Result:** The system automatically locks the door and logs `Timeout: Door was never opened. Auto-relocking.`
+1. Pasang extension **Wokwi Simulator** di VS Code.
+2. Buka workspace project ini.
+3. Buka file [`firmware/esp32/diagram.json`](../diagram.json).
+4. Tekan tombol `F1` di VS Code, lalu ketik dan pilih: **`Wokwi: Start Simulator`**.
 
-### 5. Door Ajar Alarm (Left Open Too Long)
-- Tap a valid card and flip the slide switch to OPEN.
-- Leave it open for **30 seconds**.
-- **Result:** Yellow LED turns ON, and buzzer beeps continuously with an alarm tone until the switch is flipped back to CLOSED.
+---
+
+## 4. Skenario Pengujian Interaktif
+
+### A. Kartu Terdaftar (Akses Diterima)
+1. Klik modul **MFRC522** di layar simulator.
+2. Pilih kartu default biru (**UID `04:A3:92:7F`**, terdaftar atas nama *Siswa Teladan*).
+3. **Hasil**:
+   - Modul Relay berbunyi klik dan aktif.
+   - Indikator **Solenoid Lock (Biru)** menyala terang.
+   - **LED Hijau** menyala.
+   - Buzzer membunyikan 2 nada ceria.
+   - Log absensi dikirim otomatis ke Supabase melalui Wi-Fi virtual (`Wokwi-GUEST`).
+   - Layar Dashboard website menampilkan nama **Siswa Teladan** secara real-time!
+
+### B. Kartu Tidak Terdaftar (Akses Ditolak)
+1. Klik modul MFRC522 dan pilih kartu merah (**UID `AA:BB:CC:DD`**).
+2. **Hasil**:
+   - **LED Merah** menyala.
+   - Buzzer membunyikan nada rendah peringatan.
+   - Solenoid tetap terkunci.
+   - Log kartu ditolak tercatat di Supabase dan dashboard.
+
+### C. Simulasi Sensor Magnet Pintu (Reed Switch)
+- **Membuka & Menutup Pintu**:
+  Setelah tap kartu valid, geser **Slide Switch** (GPIO 27) untuk menyimulasikan pintu dibuka. Geser kembali ke posisi awal untuk menyimulasikan pintu tertutup. Relay dan solenoid langsung mengunci kembali seketika.
+- **Auto-Relock 5 Detik**:
+  Jika kartu di-tap namun pintu tidak dibuka dalam 5 detik, sistem otomatis mengunci kembali relai.
+- **Alarm Pintu Dibiarkan Terbuka (Door Ajar)**:
+  Buka pintu (geser switch) dan biarkan selama >20 detik. **LED Kuning** akan menyala dan buzzer akan berbunyi intermiten hingga switch ditutup kembali.
