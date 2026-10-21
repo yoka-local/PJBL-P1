@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Save, Bell, ShieldCheck, Cpu, Sliders, Check, Radio } from 'lucide-react';
+import { Save, Bell, ShieldCheck, Cpu, Sliders, Check, Radio, AlertCircle, RefreshCw } from 'lucide-react';
+import { supabase } from '../supabase';
 
 interface SystemSettings {
   doorUnlockDuration: number;
@@ -17,8 +18,8 @@ const DEFAULT_SETTINGS: SystemSettings = {
   doorUnlockDuration: 4,
   doorAjarTimeout: 15,
   tapCooldown: 3,
-  telegramBotToken: '739281928:AAH9f2910kd0a...',
-  telegramChatId: '-100987654321',
+  telegramBotToken: '',
+  telegramChatId: '',
   alertOnDenied: true,
   alertOnDoorAjar: true,
   supabaseEndpoint: 'https://zdsmcifmlbwejyihorqs.supabase.co',
@@ -38,7 +39,37 @@ export default function SettingsView() {
     return DEFAULT_SETTINGS;
   });
 
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'system_settings')
+        .maybeSingle();
+
+      if (!error && data?.value) {
+        setSettings((prev) => ({
+          ...prev,
+          ...data.value,
+        }));
+        localStorage.setItem('nfckey_settings', JSON.stringify(data.value));
+      }
+    } catch (err) {
+      console.warn('Error fetching settings from Supabase:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (savedSuccess) {
@@ -47,10 +78,34 @@ export default function SettingsView() {
     }
   }, [savedSuccess]);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('nfckey_settings', JSON.stringify(settings));
-    setSavedSuccess(true);
+    setSaving(true);
+    setSaveError(null);
+    try {
+      localStorage.setItem('nfckey_settings', JSON.stringify(settings));
+
+      const { error } = await supabase
+        .from('settings')
+        .upsert(
+          {
+            key: 'system_settings',
+            value: settings,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'key' }
+        );
+
+      if (error) {
+        throw error;
+      }
+      setSavedSuccess(true);
+    } catch (err: any) {
+      console.error('Error saving settings to Supabase:', err);
+      setSaveError(err.message || 'Gagal menyimpan pengaturan ke cloud Supabase');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -66,12 +121,32 @@ export default function SettingsView() {
           </p>
         </div>
 
-        {savedSuccess && (
-          <div className="flex items-center gap-2 text-sm text-[#1a7f37] bg-[#dafbe1] border border-[#4ac26b66] px-3 py-1.5 rounded-md font-medium">
-            <Check className="w-4 h-4" /> Settings saved successfully
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={fetchSettings}
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-[#d0d7de] rounded-md text-xs font-semibold text-[#24292f] bg-[#f6f8fa] hover:bg-[#f3f4f6] transition disabled:opacity-50"
+            title="Reload from Supabase"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+
+          {savedSuccess && (
+            <div className="flex items-center gap-2 text-sm text-[#1a7f37] bg-[#dafbe1] border border-[#4ac26b66] px-3 py-1.5 rounded-md font-medium">
+              <Check className="w-4 h-4" /> Cloud settings saved
+            </div>
+          )}
+        </div>
       </div>
+
+      {saveError && (
+        <div className="flex items-center gap-2 text-sm text-[#cf222e] bg-[#FFEBE9] border border-[#ff818266] p-3 rounded-md">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span>{saveError}</span>
+        </div>
+      )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Door Hardware Timings */}
@@ -238,9 +313,18 @@ export default function SettingsView() {
         <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="flex items-center gap-2 bg-[#2da44e] hover:bg-[#2c974b] text-white px-5 py-2 rounded-md font-medium text-sm transition-colors shadow-sm"
+            disabled={saving}
+            className="flex items-center gap-2 bg-[#2da44e] hover:bg-[#2c974b] text-white px-5 py-2 rounded-md font-medium text-sm transition-colors shadow-sm disabled:opacity-60 cursor-pointer"
           >
-            <Save className="w-4 h-4" /> Save Configuration
+            {saving ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin" /> Saving to Supabase...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" /> Save Configuration
+              </>
+            )}
           </button>
         </div>
       </form>

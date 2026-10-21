@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, CreditCard, PowerOff, CheckCircle, Trash2, X } from 'lucide-react';
+import { Plus, CreditCard, PowerOff, CheckCircle, Trash2, X, RefreshCw } from 'lucide-react';
 import { supabase } from '../supabase';
 
 interface CardItem {
@@ -20,9 +20,26 @@ export default function Cards() {
 
   useEffect(() => {
     fetchCards();
+
+    // Supabase Realtime Subscription for Cards
+    const channel = supabase
+      .channel('public:cards_table')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'cards' },
+        () => {
+          fetchCards();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchCards = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('cards')
@@ -39,7 +56,9 @@ export default function Cards() {
         })));
       }
     } catch (err) {
-      console.warn('Using local cards state:', err);
+      console.warn('Cards fetch fallback:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -115,12 +134,21 @@ export default function Cards() {
           <h2 className="text-2xl font-bold text-slate-800">Manajemen Kartu NFC / RFID</h2>
           <p className="text-slate-500 mt-1">Registrasi kartu smart tag baru dan atur status akses operasional.</p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)} 
-          className="flex items-center gap-2 px-4 py-2 bg-[#2da44e] text-white rounded-lg hover:bg-[#2c974b] transition-colors text-sm font-medium shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Daftarkan Kartu
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={fetchCards} 
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition cursor-pointer"
+            title="Muat Ulang Kartu"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </button>
+          <button 
+            onClick={() => setShowModal(true)} 
+            className="flex items-center gap-2 px-4 py-2 bg-[#2da44e] text-white rounded-lg hover:bg-[#2c974b] transition-colors text-sm font-medium shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> Daftarkan Kartu
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

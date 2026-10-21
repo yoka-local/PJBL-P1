@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X, RefreshCw } from 'lucide-react';
 import { supabase } from '../supabase';
 
 interface UserItem {
@@ -20,9 +20,26 @@ export default function Users() {
 
   useEffect(() => {
     fetchUsers();
+
+    // Supabase Realtime Subscription for Users
+    const channel = supabase
+      .channel('public:users_table')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'users' },
+        () => {
+          fetchUsers();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('users')
@@ -39,7 +56,9 @@ export default function Users() {
         })));
       }
     } catch (err) {
-      console.warn('Using local users state:', err);
+      console.warn('Users fetch fallback:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,12 +67,13 @@ export default function Users() {
     if (!name.trim()) return;
 
     setLoading(true);
+    const formattedCardUid = cardUid.trim().toUpperCase();
     const newUser: UserItem = {
       id: Date.now(),
       user_code: `EMP-${100 + users.length + 1}`,
       name: name.trim(),
       dept: dept.trim() || 'Umum',
-      card_uid: cardUid.trim().toUpperCase() || 'Belum Terhubung',
+      card_uid: formattedCardUid || 'Belum Terhubung',
     };
 
     try {
@@ -62,7 +82,7 @@ export default function Users() {
           name: newUser.name,
           department: newUser.dept,
           user_code: newUser.user_code,
-          card_uid: newUser.card_uid,
+          card_uid: newUser.card_uid !== 'Belum Terhubung' ? newUser.card_uid : null,
         }
       ]).select();
 
@@ -71,6 +91,20 @@ export default function Users() {
         alert('Gagal menyimpan user ke Supabase: ' + error.message);
       } else if (data && data.length > 0) {
         newUser.id = data[0].id;
+
+        // Auto sync with cards table if a valid NFC card UID was specified
+        if (formattedCardUid && formattedCardUid !== 'BELUM TERHUBUNG' && formattedCardUid !== '-') {
+          await supabase.from('cards').upsert(
+            {
+              uid: formattedCardUid,
+              owner_name: newUser.name,
+              role: newUser.dept || 'Siswa',
+              user_id: data[0].id,
+              is_active: true,
+            },
+            { onConflict: 'uid' }
+          );
+        }
       }
     } catch (err) {
       console.warn('Error saving user to Supabase:', err);
@@ -101,12 +135,21 @@ export default function Users() {
           <h2 className="text-2xl font-bold text-slate-800">Data Pengguna & Siswa</h2>
           <p className="text-slate-500 mt-1">Kelola data identitas dan hubungkan dengan UID kartu NFC/RFID.</p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)} 
-          className="flex items-center gap-2 px-4 py-2 bg-[#2da44e] text-white rounded-lg hover:bg-[#2c974b] transition-colors text-sm font-medium shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Tambah Pengguna
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={fetchUsers} 
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition cursor-pointer"
+            title="Muat Ulang Pengguna"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </button>
+          <button 
+            onClick={() => setShowModal(true)} 
+            className="flex items-center gap-2 px-4 py-2 bg-[#2da44e] text-white rounded-lg hover:bg-[#2c974b] transition-colors text-sm font-medium shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> Tambah Pengguna
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">

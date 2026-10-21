@@ -20,6 +20,32 @@ export default function Logs() {
 
   useEffect(() => {
     fetchLogs();
+
+    // Supabase Realtime Subscription for live taps
+    const channel = supabase
+      .channel('public:attendances_logs')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'attendances' },
+        (payload: any) => {
+          const r = payload.new;
+          const newLog: LogItem = {
+            id: r.id,
+            event_id: r.event_id || `EVT-${r.id}`,
+            time: new Date(r.timestamp || Date.now()).toLocaleString('id-ID'),
+            name: r.user_name || (r.status === 'Diterima' ? 'Siswa Terdaftar' : 'Kartu Ditolak'),
+            uid: r.card_uid,
+            device: r.device_id || 'GATE-01',
+            status: r.status === 'Diterima' ? 'Diterima' : 'Ditolak',
+          };
+          setLogs((prev) => [newLog, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchLogs = async () => {
@@ -29,7 +55,7 @@ export default function Logs() {
         .from('attendances')
         .select('*')
         .order('timestamp', { ascending: false })
-        .limit(50);
+        .limit(100);
 
       if (!error && data) {
         setLogs(data.map((r: any) => ({
@@ -43,7 +69,7 @@ export default function Logs() {
         })));
       }
     } catch (err) {
-      console.warn('Using local logs state:', err);
+      console.warn('Logs fetch fallback:', err);
     } finally {
       setLoading(false);
     }

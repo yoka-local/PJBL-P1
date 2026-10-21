@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Smartphone, Plus, Trash2, Copy, Check, X } from 'lucide-react';
+import { Smartphone, Plus, Trash2, Copy, Check, X, RefreshCw } from 'lucide-react';
 import { supabase } from '../supabase';
 
 interface Device {
@@ -20,9 +20,26 @@ export default function Devices() {
 
   useEffect(() => {
     fetchDevices();
+
+    // Supabase Realtime Subscription for Devices
+    const channel = supabase
+      .channel('public:devices_table')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'devices' },
+        () => {
+          fetchDevices();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchDevices = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('devices')
@@ -33,7 +50,9 @@ export default function Devices() {
         setDevices(data);
       }
     } catch (error) {
-      console.warn('Using local devices state:', error);
+      console.warn('Devices fetch fallback:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,7 +106,11 @@ export default function Devices() {
   };
 
   const copyConfigCode = () => {
-    const code = `// Konfigurasi Supabase untuk firmware/esp32/src/config.h\n#define DEVICE_ID "GATE-01"\n#define API_URL "https://zdsmcifmlbwejyihorqs.supabase.co/rest/v1/attendances"\n#define API_TOKEN "${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGci...'}"`;
+    const code = `// Konfigurasi Supabase untuk firmware/esp32/NFCKey_Hardware_IRL/Config.h
+#define DEVICE_ID     "GATE-01"
+#define SUPABASE_URL  "https://zdsmcifmlbwejyihorqs.supabase.co"
+#define SUPABASE_KEY  "${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGci...'}"
+#define API_URL       "https://zdsmcifmlbwejyihorqs.supabase.co/rest/v1/attendances"`;
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -100,17 +123,24 @@ export default function Devices() {
           <h2 className="text-2xl font-bold text-slate-800">Manajemen Perangkat Gateway</h2>
           <p className="text-slate-500 mt-1">Daftarkan dan pantau status konektivitas mikrokontroler ESP32.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={fetchDevices} 
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition cursor-pointer"
+            title="Muat Ulang Gateway"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </button>
           <button 
             onClick={copyConfigCode} 
-            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-50 transition cursor-pointer"
           >
             {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-            {copied ? 'Tersalin!' : 'Salin Kode Konfigurasi ESP32'}
+            {copied ? 'Tersalin!' : 'Salin Kode Config.h'}
           </button>
           <button 
             onClick={() => setShowAdd(true)} 
-            className="flex items-center gap-2 px-4 py-2 bg-[#2da44e] text-white rounded-lg hover:bg-[#2c974b] text-sm font-medium transition shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-[#2da44e] text-white rounded-lg hover:bg-[#2c974b] text-sm font-medium transition shadow-sm cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Tambah Gateway
           </button>

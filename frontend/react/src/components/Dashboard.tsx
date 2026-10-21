@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DoorOpen, Activity, RefreshCw } from 'lucide-react';
+import { DoorOpen, Activity, RefreshCw, CreditCard } from 'lucide-react';
 import { supabase } from '../supabase';
 
 interface AttendanceLog {
@@ -14,18 +14,19 @@ interface AttendanceLog {
 export default function Dashboard() {
   const [logs, setLogs] = useState<AttendanceLog[]>([]);
   const [totalHadir, setTotalHadir] = useState<number>(0);
-  const [terlambat] = useState<number>(0);
+  const [totalCards, setTotalCards] = useState<number>(0);
   const [kartuDitolak, setKartuDitolak] = useState<number>(0);
   const [doorStatus, setDoorStatus] = useState<'Terkunci' | 'Terbuka'>('Terkunci');
   const [isDeviceOnline, setIsDeviceOnline] = useState<boolean>(true);
+  const [deviceName, setDeviceName] = useState<string>('GATE-01');
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchDashboardData();
 
-    // Setup Supabase Realtime Subscription
-    const channel = supabase
-      .channel('public:attendances')
+    // 1. Setup Supabase Realtime Subscription for Attendances
+    const attendanceChannel = supabase
+      .channel('public:attendances_dashboard')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'attendances' },
@@ -53,8 +54,26 @@ export default function Dashboard() {
       )
       .subscribe();
 
+    // 2. Setup Supabase Realtime Subscription for Devices
+    const deviceChannel = supabase
+      .channel('public:devices_dashboard')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'devices' },
+        (payload: any) => {
+          if (payload.new) {
+            setIsDeviceOnline(payload.new.status === 'online');
+            if (payload.new.device_id) {
+              setDeviceName(payload.new.device_id);
+            }
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(attendanceChannel);
+      supabase.removeChannel(deviceChannel);
     };
   }, []);
 
@@ -78,15 +97,26 @@ export default function Dashboard() {
           status: row.status === 'Diterima' ? 'Diterima' : 'Ditolak',
         }));
         setLogs(formatted);
-
-        // Calculate dynamic stats
-        const granted = attendanceData.filter((r: any) => r.status === 'Diterima').length;
-        const denied = attendanceData.filter((r: any) => r.status === 'Ditolak').length;
-        setTotalHadir(granted);
-        setKartuDitolak(denied);
       }
 
-      // 2. Fetch Device Status
+      // 2. Query exact counts from Supabase
+      const [hadirRes, ditolakRes, cardsRes] = await Promise.all([
+        supabase.from('attendances').select('*', { count: 'exact', head: true }).eq('status', 'Diterima'),
+        supabase.from('attendances').select('*', { count: 'exact', head: true }).eq('status', 'Ditolak'),
+        supabase.from('cards').select('*', { count: 'exact', head: true }),
+      ]);
+
+      if (hadirRes.count !== null && hadirRes.count !== undefined) {
+        setTotalHadir(hadirRes.count);
+      }
+      if (ditolakRes.count !== null && ditolakRes.count !== undefined) {
+        setKartuDitolak(ditolakRes.count);
+      }
+      if (cardsRes.count !== null && cardsRes.count !== undefined) {
+        setTotalCards(cardsRes.count);
+      }
+
+      // 3. Fetch Device Status
       const { data: deviceData } = await supabase
         .from('devices')
         .select('*')
@@ -94,9 +124,10 @@ export default function Dashboard() {
 
       if (deviceData && deviceData.length > 0) {
         setIsDeviceOnline(deviceData[0].status === 'online');
+        setDeviceName(deviceData[0].device_id || 'GATE-01');
       }
     } catch (err) {
-      console.warn('Using local dashboard state:', err);
+      console.warn('Dashboard fetch fallback:', err);
     } finally {
       setLoading(false);
     }
@@ -112,7 +143,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-4">
           <button 
             onClick={fetchDashboardData} 
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition cursor-pointer"
             title="Muat Ulang Data"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -122,7 +153,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mt-0.5">
               <span className={`w-2.5 h-2.5 rounded-full ${isDeviceOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
               <span className="text-sm font-medium text-slate-700">
-                {isDeviceOnline ? 'Online (GATE-01)' : 'Offline'}
+                {isDeviceOnline ? `Online (${deviceName})` : `Offline (${deviceName})`}
               </span>
             </div>
           </div>
@@ -130,9 +161,16 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <StatCard title="Total Hadir" value={totalHadir.toString()} subtitle="Pengguna" color="text-green-600" bg="bg-green-100" />
-        <StatCard title="Terlambat" value={terlambat.toString()} subtitle="Pengguna" color="text-yellow-600" bg="bg-yellow-100" />
-        <StatCard title="Kartu Ditolak" value={kartuDitolak.toString()} subtitle="Percobaan" color="text-red-600" bg="bg-red-100" />
+        <StatCard title="Total Hadir" value={totalHadir.toString()} subtitle="Tap Diterima" color="text-green-600" bg="bg-green-100" />
+        <StatCard 
+          title="Kartu Terdaftar" 
+          value={totalCards.toString()} 
+          subtitle="Kartu Aktif" 
+          color="text-blue-600" 
+          bg="bg-blue-100" 
+          icon={<CreditCard className="w-6 h-6 text-blue-600" />} 
+        />
+        <StatCard title="Kartu Ditolak" value={kartuDitolak.toString()} subtitle="Percobaan Ilegal" color="text-red-600" bg="bg-red-100" />
         <StatCard 
           title="Status Solenoid" 
           value={doorStatus} 
