@@ -67,3 +67,29 @@ struct AttendanceEvent {
     String device_id;
     String status; // "Diterima" atau "Ditolak"
 };
+
+// ============================================================================
+// 5. PROTOTIPE FUNGSI (Memastikan kompatibilitas kompilasi multi-tab)
+// ============================================================================
+// DoorController.ino
+void door_init();
+void door_unlock();
+void door_reject();
+void door_update();
+void lockDoor();
+void unlockDoor();
+
+// RfidReader.ino
+void rfid_init();
+String rfid_update();
+bool rfid_is_card_valid(const String& uid);
+
+// NetworkSync.ino
+void wifi_init();
+void wifi_update();
+void queue_push(const AttendanceEvent& event);
+bool queue_peek(AttendanceEvent& event);
+void queue_remove();
+void sync_update();
+void heartbeat_update();
+

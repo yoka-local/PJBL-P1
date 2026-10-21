@@ -22,7 +22,10 @@ void unlockDoor() {
 }
 
 void door_init() {
+    // Tulis status OFF sebelum pinMode agar relay tidak berbunyi/terpicu sesaat saat booting ESP32
+    digitalWrite(PIN_DOOR_RELAY, RELAY_TRIGGER_OFF);
     pinMode(PIN_DOOR_RELAY, OUTPUT);
+    
     pinMode(PIN_LED_GREEN, OUTPUT);
     pinMode(PIN_LED_RED, OUTPUT);
     pinMode(PIN_LED_YELLOW, OUTPUT);

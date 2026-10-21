@@ -36,6 +36,9 @@ void rfid_init() {
     mfrc522.PCD_Init();
     delay(50);
     
+    // Set penguatan antena RC522 ke tingkat maksimal (+48 dB) agar kartu lebih responsif terbaca
+    mfrc522.PCD_SetAntennaGain(mfrc522.RxGain_max);
+    
     byte version = mfrc522.PCD_ReadRegister(mfrc522.VersionReg);
     Serial.printf("[RFID] MFRC522 Firmware Version: 0x%02X\n", version);
     if (version == 0x00 || version == 0xFF) {
@@ -57,6 +60,7 @@ String rfid_update() {
     }
     uidString.toUpperCase();
     mfrc522.PICC_HaltA();
+    mfrc522.PCD_StopCrypto1();
 
     // Debounce agar tidak terbaca berkali-kali dalam 2 detik
     if (uidString == lastReadUid && (millis() - lastReadTime) < DEBOUNCE_DELAY_MS) {

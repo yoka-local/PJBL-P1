@@ -92,6 +92,7 @@ void sync_update() {
 
     HTTPClient http;
     http.begin(API_URL);
+    http.setTimeout(3500); // Mencegah freeze pada RFID dan pintu jika internet lambat
     http.addHeader("Content-Type", "application/json");
     http.addHeader("apikey", SUPABASE_KEY);
     http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
@@ -137,6 +138,7 @@ void heartbeat_update() {
     HTTPClient http;
     String url = String(SUPABASE_URL) + "/rest/v1/devices?device_id=eq." + String(DEVICE_ID);
     http.begin(url);
+    http.setTimeout(3500);
     http.addHeader("Content-Type", "application/json");
     http.addHeader("apikey", SUPABASE_KEY);
     http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
@@ -144,6 +146,8 @@ void heartbeat_update() {
     int httpResponseCode = http.sendRequest("PATCH", "{\"status\":\"online\"}");
     if (httpResponseCode > 0) {
         Serial.printf("[HEARTBEAT] Ping Supabase Aktif (HTTP %d)\n", httpResponseCode);
+    } else {
+        Serial.printf("[HEARTBEAT] Ping Gagal: %s\n", http.errorToString(httpResponseCode).c_str());
     }
     http.end();
 }
