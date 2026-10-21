@@ -5,7 +5,7 @@
 // 1. PENGATURAN WI-FI & KREDENSIAL DATABASE SUPABASE
 // ============================================================================
 // Ganti SSID & Password di bawah jika menggunakan hotspot HP lain saat pengujian:
-#define WIFI_SSID     "PJBLSimulation"
+#define WIFI_SSID     "PLN nyalakan PJBLku"
 #define WIFI_PASSWORD "Yorushika"
 
 #define DEVICE_ID     "GATE-01"
