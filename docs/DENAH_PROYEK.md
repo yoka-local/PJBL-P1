@@ -49,30 +49,30 @@ Penempatan komponen dirancang dengan memisahkan **Sisi Luar (Public/Unsecured Si
 
 * **Deskripsi:** Kondisi standar di mana kartu siswa yang terdaftar di-tap pada pembaca kartu saat listrik dan jaringan Wi-Fi normal.
 * **Alur Kerja:**
-  1. Siswa menempelkan kartu NFC/RFID ke pembaca RC522.
+  1. Siswa menempelkan kartu NFC/RFID ke pembaca PN532 / RC522.
   2. ESP32 membaca UID dan mencocokkan ke database/cache.
-  3. Status terverifikasi $\rightarrow$ Relay dipicu `HIGH`, solenoid menarik lidah pengunci (*Door Unlocked*).
-  4. LED Hijau (GPIO 32) menyala dan Buzzer (GPIO 14) berbunyi 1x bip pendek.
-  5. Pintu didorong terbuka $\rightarrow$ Reed switch (GPIO 27) berubah menjadi `OPEN`.
-  6. Siswa masuk dan pintu tertutup kembali $\rightarrow$ Reed switch berubah menjadi `CLOSED`.
-  7. Relay kembali ke `LOW` (*Door Locked*).
+  3. Status terverifikasi $\rightarrow$ Relay dipicu `LOW` (Active LOW), solenoid menarik lidah pengunci (*Door Unlocked*).
+  4. LED Hijau (GPIO 32) menyala dan Buzzer (GPIO 14) berbunyi 2x nada ceria.
+  5. Pintu didorong terbuka $\rightarrow$ Reed switch (GPIO 27) berubah menjadi `OPEN` (`HIGH`).
+  6. Siswa masuk dan pintu tertutup kembali $\rightarrow$ Reed switch berubah menjadi `CLOSED` (`LOW`).
+  7. Relay kembali ke `HIGH` (*Door Locked*).
   8. Log presensi siswa dikirimkan langsung ke backend Laravel dan dashboard pemantau.
 
 ---
 
-### ⚡ Condition 2: Lights Out / Power Outage (Mati Listrik s.d. Listrik Pulih)
+### ⚡ Condition 2: Safe Cold-Boot & Power Outage (Booting Aman & Mati Listrik)
 ![Condition 2](conditions/condition2.jpg)
 
-* **Deskripsi:** Terjadi pemadaman listrik PLN total atau kabel daya terputus.
+* **Deskripsi:** Terjadi pemadaman listrik PLN total atau ESP32 pertama kali dinyalakan (cold-boot).
 * **Perilaku Kunci (Fail-Secure vs Fail-Safe):**
   * Solenoid yang digunakan berjenis **Fail-Secure (Normally Closed)**.
   * **Saat Mati Listrik:** Tanpa tegangan listrik (0V DC), pegas mekanis mendorong lidah solenoid tetap mengunci rapat. **Pintu tetap TERKUNCI dari luar** sehingga aset sekolah/ruangan tetap aman dari pihak luar.
   * **Aspek Keselamatan Jiwa (Life-Safety Egress):** Di sisi dalam pintu dilengkapi gagang manual darurat (*mechanical panic handle/thumbturn*) yang memungkinkan evakuasi keluar ruangan tanpa membutuhkan listrik sama sekali.
-* **Saat Listrik Menyala Kembali (Power Back Up):**
+* **Saat Listrik Menyala Kembali (Safe Boot Logic):**
   1. ESP32 otomatis *cold-boot* dan menjalankan inisialisasi pin (`door_init`).
-  2. Relay langsung diset ke `LOW` (memastikan kunci tetap aman terkunci).
+  2. Register hardware relay diset ke `HIGH` (non-aktif) **sebelum** `pinMode(PIN_DOOR_RELAY, OUTPUT)` dijalankan, menjamin relay **tidak mengalami glitch clicking** saat booting.
   3. Membaca sensor reed switch untuk memastikan pintu dalam posisi tertutup rapat.
-  4. ESP32 menghubungkan ulang koneksi Wi-Fi dan sinkronisasi jam sistem via NTP.
+  4. ESP32 menghubungkan ulang koneksi Wi-Fi (LED Kuning berkedip) dan sinkronisasi jam sistem via NTP/Supabase.
 
 ---
 
@@ -147,7 +147,7 @@ Berdasarkan konfigurasi pada firmware `firmware/esp32/src/config.h`:
 | **RC522 MOSI** | GPIO 23 | Output | VSPI Master Out Slave In |
 | **RC522 MISO** | GPIO 19 | Input | VSPI Master In Slave Out |
 | **RC522 RST** | GPIO 22 | Output | Reset pin modul RFID |
-| **Relay Solenoid** | GPIO 26 | Output | Trigger driver solenoid (HIGH = Buka, LOW = Kunci) |
+| **Relay Solenoid** | GPIO 26 | Output | Trigger driver solenoid (Active LOW: LOW = Buka, HIGH = Kunci) |
 | **Reed Switch** | GPIO 27 | Input Pull-Up | Sensor magnet pintu (LOW = Tertutup, HIGH = Terbuka) |
 | **Active Buzzer** | GPIO 14 | Output | Audio feedback & sirine alarm |
 | **LED Hijau** | GPIO 32 | Output | Indikator akses diterima |

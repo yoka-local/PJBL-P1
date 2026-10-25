@@ -108,16 +108,16 @@ flowchart LR
 
 ## 📸 Dokumentasi Bukti 6 Kondisi Operasional Fisik
 
-Sistem telah diuji dan divalidasi terhadap **6 Kondisi Operasional Nyata** dengan bukti dokumentasi foto pada folder [`docs/conditions/`](./docs/conditions/):
+Sistem telah diuji dan divalidasi terhadap **6 Kondisi Operasional Nyata** yang selaras 100% dengan firmware, dilengkapi dokumentasi panduan lengkap pada folder [`conditions/`](./conditions/):
 
 | Kondisi | Foto Dokumentasi | Hasil Pengujian Lapangan |
 | :--- | :---: | :--- |
-| **Condition 1: Normal Operation** | [`condition1.jpg`](./docs/conditions/condition1.jpg) | Tap kartu sah $\rightarrow$ Solenoid terbuka $\rightarrow$ LED Hijau ON $\rightarrow$ Pintu dibuka $\rightarrow$ Pintu ditutup $\rightarrow$ Solenoid mengunci instan $\rightarrow$ Log tersimpan di cloud. |
-| **Condition 2: Safe Cold-Boot** | [`condition2.jpg`](./docs/conditions/condition2.jpg) | Sistem dialiri listrik $\rightarrow$ Relay aman tanpa glitch/clicking $\rightarrow$ Solenoid tetap terkunci rapat $\rightarrow$ LED Kuning mencari Wi-Fi. |
-| **Condition 3: Access Denied** | [`condition3.jpg`](./docs/conditions/condition3.jpg) | Kartu asing ditempelkan $\rightarrow$ Solenoid tetap terkunci $\rightarrow$ LED Merah menyala $\rightarrow$ Buzzer berbunyi nada tolak $\rightarrow$ Percobaan akses ilegal tercatat. |
-| **Condition 4: Door Ajar Alert** | [`condition4.jpg`](./docs/conditions/condition4.jpg) | Pintu ditahan terbuka >30 detik $\rightarrow$ LED Kuning berkedip cepat $\rightarrow$ Buzzer berbunyi peringatan intermiten $\rightarrow$ Padam saat pintu ditutup rapat. |
-| **Condition 5: Forced Entry Alarm** | [`condition5.jpg`](./docs/conditions/condition5.jpg) | Pintu dibuka paksa tanpa tap kartu $\rightarrow$ Sirine darurat kencang menyala $\rightarrow$ LED Merah berkedip *strobe* $\rightarrow$ Alert darurat terkirim ke web. |
-| **Condition 6: Offline-First Operation** | [`condition6.jpg`](./docs/conditions/condition6.jpg) | Wi-Fi diputus $\rightarrow$ Tap kartu tetap membuka pintu $\rightarrow$ Event tersimpan di antrean lokal $\rightarrow$ Wi-Fi dinyalakan kembali $\rightarrow$ Sinkronisasi otomatis ke cloud. |
+| **Condition 1: Normal Operation** | [`condition1.jpg`](./conditions/condition1.jpg) | Tap kartu sah $\rightarrow$ Solenoid terbuka (Relay Active LOW) $\rightarrow$ LED Hijau ON $\rightarrow$ Pintu dibuka $\rightarrow$ Pintu ditutup $\rightarrow$ Solenoid mengunci instan $\rightarrow$ Log tersimpan di cloud. |
+| **Condition 2: Safe Cold-Boot** | [`condition2.jpg`](./conditions/condition2.jpg) | Sistem dialiri listrik $\rightarrow$ Relay aman tanpa glitch/clicking (register pin diset sebelum pinMode) $\rightarrow$ Solenoid tetap terkunci rapat (Fail-Secure) $\rightarrow$ LED Kuning mencari Wi-Fi. |
+| **Condition 3: Access Denied** | [`condition3.jpg`](./conditions/condition3.jpg) | Kartu asing ditempelkan $\rightarrow$ Solenoid tetap terkunci $\rightarrow$ LED Merah menyala $\rightarrow$ Buzzer berbunyi nada tolak $\rightarrow$ Percobaan akses ilegal tercatat. |
+| **Condition 4: Door Ajar Alert** | [`condition4.jpg`](./conditions/condition4.jpg) | Pintu ditahan terbuka >30 detik $\rightarrow$ LED Kuning berkedip cepat $\rightarrow$ Buzzer berbunyi peringatan intermiten $\rightarrow$ Padam saat pintu ditutup rapat. |
+| **Condition 5: Forced Entry Alarm** | [`condition5.jpg`](./conditions/condition5.jpg) | Pintu dibuka paksa tanpa tap kartu $\rightarrow$ Sirine darurat kencang menyala $\rightarrow$ LED Merah berkedip *strobe* $\rightarrow$ Alert darurat terkirim ke web. |
+| **Condition 6: Offline-First Operation** | [`condition6.jpg`](./conditions/condition6.jpg) | Wi-Fi diputus $\rightarrow$ Tap kartu tetap membuka pintu $\rightarrow$ Event tersimpan di antrean lokal FIFO buffer $\rightarrow$ Wi-Fi dinyalakan kembali $\rightarrow$ Sinkronisasi otomatis ke cloud. |
 
 ---
 
