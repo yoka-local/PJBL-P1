@@ -1,4 +1,4 @@
 [wokwi]
 version = 1
-firmware = 'firmware.bin'
-elf = 'firmware.elf'
+firmware = 'firmware/esp32/wokwi_simulation/firmware.bin'
+elf = 'firmware/esp32/wokwi_simulation/firmware.elf'

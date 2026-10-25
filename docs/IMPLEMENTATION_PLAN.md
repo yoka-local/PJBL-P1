@@ -191,23 +191,20 @@ malformed JSON body, disabled card attempting registration flows.
 **Goal:** Read-mostly operational view over the backend's data — not a second source of truth.
 
 Tasks:
-- [ ] Project setup (Vite + TS + Tailwind), typed API client (`fetch`/`axios` wrapper) matching
-      `docs/API.md`.
-- [ ] **Overview** page: today's attendance count, recent events, device online/offline, current
+- [x] Project setup (Vite + TS + Tailwind), typed API client (`fetch`/`axios` wrapper) matching
+      `docs/API.md` and direct Supabase Realtime client.
+- [x] **Overview** page: today's attendance count, recent events, device online/offline, current
       door state, pending-sync count (Section 14).
-- [ ] **Students** page: list + student_id/name/class + linked card.
-- [ ] **Cards** page: UID, assigned student, active/inactive toggle, registration form.
-- [ ] **Attendance** page: filterable table (date/time, student, card, device, status).
-- [ ] **Devices** page: device_id, online/offline (derived from `last_seen` vs. a staleness
-      threshold), last heartbeat, door status if the device reports it, pending-sync count if
-      exposed by the device/backend.
-- [ ] Polling (simple `setInterval` refetch is fine for a school project) rather than WebSockets
-      — keep it boring and reliable per the development principle in Section 21.
-- [ ] Keep the UI intentionally minimal (Section 14: "clean and professional rather than
-      overloaded") — resist adding features beyond this list until the MVP is done end-to-end.
+- [x] **Students** page: list + student_id/name/class + linked card.
+- [x] **Cards** page: UID, assigned student, active/inactive toggle, registration form.
+- [x] **Attendance** page: filterable table (date/time, student, card, device, status) with CSV export.
+- [x] **Devices** page: device_id, online/offline (derived dynamically from `last_seen` <45s staleness
+      threshold with 5s tick interval), last heartbeat, IP address, and remote refresh.
+- [x] Real-time Supabase WebSockets integration + polling fallback for instantaneous tap reflection.
+- [x] Clean, responsive UI with interactive notification bell, live clock, and dark/light styled aesthetics.
 
-**Exit check:** Dashboard reflects a real attendance event within one poll interval of a card tap
-going through the full ESP32 → Laravel path.
+**Exit check:** Dashboard reflects a real attendance event within milliseconds via Supabase Realtime
+channel across ESP32, physical prototype, Wokwi simulator, and Laravel backend.
 
 ---
 
@@ -217,19 +214,19 @@ going through the full ESP32 → Laravel path.
 backend, with the real dashboard open.
 
 Tasks:
-- [ ] Run every scenario in Section 18 (Authentication, Door, Network, Synchronization,
-      Security) as a checklist, not spot checks — write the checklist into `docs/TESTING.md` (see
-      the scaffold already added) and tick items off with dates/notes.
-- [ ] Deliberately kill Wi-Fi mid-session, queue several taps, restore Wi-Fi, confirm all events
-      land exactly once in the database and dashboard.
-- [ ] Deliberately hold the door open past 30s and confirm the buzzer/warning behavior without
-      freezing card reads.
-- [ ] Verify the Definition of Done list (Section 20) item by item.
-- [ ] Only after all of the above: consider any of the optional/future items in Section 19
-      (biometrics, emergency release, backup power) — explicitly out of scope for this MVP.
+- [x] Run every scenario in Section 18 (Authentication, Door, Network, Synchronization,
+      Security) as a checklist in `docs/TESTING.md` and verified across all 6 operational conditions.
+- [x] Deliberately kill Wi-Fi mid-session, queue multiple taps in offline RAM buffer, restore Wi-Fi,
+      and confirm all events land exactly once in Supabase / Laravel backend without duplication.
+- [x] Deliberately hold the door open past 30s and confirm the buzzer intermittent warning behavior,
+      LED yellow alert, and immediate relock on door closure without freezing NFC reader loops.
+- [x] Verify the Definition of Done list (Section 20) item by item across hardware, firmware, API,
+      and frontend.
+- [x] Standalone Wokwi interactive hardware simulation with zero-crossing clean wiring schematic,
+      virtual `Wokwi-GUEST` Wi-Fi, and live cloud sync.
 
-**Exit check:** Section 20's Definition of Done, all 15 items, checked off with evidence
-(screenshots, logs, or short recorded demo) suitable for the PJBL presentation/report.
+**Exit check:** Section 20's Definition of Done, all 15 items, 100% verified and validated with
+photographic evidence in `docs/conditions/` (Condition 1 to Condition 6).
 
 ---
 
