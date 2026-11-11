@@ -49,10 +49,10 @@ void setup() {
     // 3. Inisialisasi Modul Wi-Fi (Non-blocking STA Mode)
     wifi_init();
 
-    // Nada Boot Penanda Sistem Siap
-    tone(PIN_BUZZER, 1000, 80);
+    // Nada Boot Penanda Sistem Siap (Active Buzzer 5V)
+    buzzer_beep(80);
     delay(100);
-    tone(PIN_BUZZER, 1600, 120);
+    buzzer_beep(120);
 
     Serial.println("\n[SYS] Inisialisasi selesai. Tempelkan kartu / e-Money / HP NFC pada reader!\n");
 }

@@ -94,6 +94,8 @@ bool door_is_open_physically();
 DoorState door_get_state();
 void led_yellow_set(bool state);
 void led_yellow_blink();
+void buzzer_set(bool state);
+void buzzer_beep(unsigned int duration_ms);
 
 // NfcModule.ino (PN532 V3)
 void nfc_init();

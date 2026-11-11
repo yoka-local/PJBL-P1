@@ -65,11 +65,11 @@ void led_yellow_blink() {
 }
 
 // Kontrol Modul Buzzer 3-Pin (Mendukung Active LOW & Active HIGH)
-static void buzzer_set(bool state) {
+void buzzer_set(bool state) {
     digitalWrite(PIN_BUZZER, state ? BUZZER_TRIGGER_ON : BUZZER_TRIGGER_OFF);
 }
 
-static void buzzer_beep(unsigned int duration_ms) {
+void buzzer_beep(unsigned int duration_ms) {
     buzzer_set(true);
     delay(duration_ms);
     buzzer_set(false);
