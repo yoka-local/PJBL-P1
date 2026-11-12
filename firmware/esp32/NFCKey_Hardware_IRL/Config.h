@@ -5,7 +5,7 @@
 // 1. PENGATURAN WI-FI & KREDENSIAL DATABASE SUPABASE
 // ============================================================================
 // Ganti SSID & Password Wi-Fi sesuai hotspot / router Anda:
-#define WIFI_SSID     "PLN nyalakan PJBLku"
+#define WIFI_SSID     "Arche"
 #define WIFI_PASSWORD "Yorushika"
 
 #define DEVICE_ID     "GATE-01"
@@ -16,7 +16,7 @@
 // ============================================================================
 // 2. PINOUT MODUL NFC PN532 V3 (RED BOARD) - MODE SPI
 // ============================================================================
-// Modul PN532 V3 Merah menggunakan koneksi SPI (DIP Switch: 1=OFF, 2=OFF)
+// Modul PN532 V3 Merah menggunakan koneksi SPI (DIP Switch: 1=0/OFF, 2=1/ON)
 #define PIN_PN532_SS         5    // Pin SS pada modul PN532 (ke GPIO 5)
 #define PIN_PN532_SCK        18   // Pin SCK pada modul PN532 (ke GPIO 18)
 #define PIN_PN532_MISO       19   // Pin MISO pada modul PN532 (ke GPIO 19)
