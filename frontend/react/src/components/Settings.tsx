@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Save, Bell, ShieldCheck, Cpu, Sliders, Check, Radio, AlertCircle, RefreshCw } from 'lucide-react';
+import { 
+  Save, Bell, ShieldCheck, Cpu, Sliders, Check, Radio, AlertCircle, RefreshCw, 
+  Clock, Zap, CheckCircle2, Send 
+} from 'lucide-react';
 import { supabase } from '../supabase';
 
 interface SystemSettings {
@@ -15,7 +18,7 @@ interface SystemSettings {
 }
 
 const DEFAULT_SETTINGS: SystemSettings = {
-  doorUnlockDuration: 4,
+  doorUnlockDuration: 5,
   doorAjarTimeout: 15,
   tapCooldown: 3,
   telegramBotToken: '',
@@ -76,7 +79,7 @@ export default function SettingsView() {
 
   useEffect(() => {
     if (savedSuccess) {
-      const timer = setTimeout(() => setSavedSuccess(false), 3000);
+      const timer = setTimeout(() => setSavedSuccess(false), 4000);
       return () => clearTimeout(timer);
     }
   }, [savedSuccess]);
@@ -99,9 +102,7 @@ export default function SettingsView() {
           { onConflict: 'key' }
         );
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
       setSavedSuccess(true);
     } catch (err: any) {
       console.error('Error saving settings to Supabase:', err);
@@ -119,7 +120,7 @@ export default function SettingsView() {
     setTestingTelegram(true);
     setTestResult(null);
     try {
-      const text = encodeURIComponent('🔔 [NFCKey System] Uji coba notifikasi bot Telegram berhasil! Sistem keamanan aktif.');
+      const text = encodeURIComponent('🔔 [NFCKey Gate System] Uji coba notifikasi bot Telegram berhasil! Sistem keamanan aktif.');
       const res = await fetch(`https://api.telegram.org/bot${settings.telegramBotToken.trim()}/sendMessage?chat_id=${settings.telegramChatId.trim()}&text=${text}`);
       const data = await res.json();
       if (data.ok) {
@@ -136,112 +137,154 @@ export default function SettingsView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between pb-4 border-b border-[#d0d7de]">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div>
-          <h2 className="text-xl font-semibold text-[#24292f] flex items-center gap-2">
-            <Sliders className="w-5 h-5 text-[#57606a]" />
-            System & Device Settings
-          </h2>
-          <p className="text-sm text-[#57606a] mt-1">
-            Configure ESP32 gate timings, Telegram instant alerts, and Supabase cloud sync parameters.
-          </p>
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center shadow-md shadow-blue-500/20">
+              <Sliders className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-slate-800 tracking-tight">
+                System & Hardware Settings
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Konfigurasi parameter gerbang ESP32, alarm door ajar, dan cloud sync Supabase.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={fetchSettings}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 border border-[#d0d7de] rounded-md text-xs font-semibold text-[#24292f] bg-[#f6f8fa] hover:bg-[#f3f4f6] transition disabled:opacity-50"
-            title="Reload from Supabase"
+            className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-50 transition shadow-xs cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${loading ? 'animate-spin' : ''}`} />
+            <span>Sync Cloud</span>
           </button>
 
           {savedSuccess && (
-            <div className="flex items-center gap-2 text-sm text-[#1a7f37] bg-[#dafbe1] border border-[#4ac26b66] px-3 py-1.5 rounded-md font-medium">
-              <Check className="w-4 h-4" /> Cloud settings saved
+            <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl font-bold animate-fadeIn">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Pengaturan tersimpan ke ESP32!</span>
             </div>
           )}
         </div>
       </div>
 
       {saveError && (
-        <div className="flex items-center gap-2 text-sm text-[#cf222e] bg-[#FFEBE9] border border-[#ff818266] p-3 rounded-md">
+        <div className="flex items-center gap-2.5 text-xs text-rose-700 bg-rose-50 border border-rose-200 p-4 rounded-xl">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{saveError}</span>
         </div>
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
-        {/* Door Hardware Timings */}
-        <div className="border border-[#d0d7de] rounded-md overflow-hidden bg-white">
-          <div className="bg-[#f6f8fa] border-b border-[#d0d7de] px-4 py-3 flex items-center gap-2 text-sm font-semibold text-[#24292f]">
-            <ShieldCheck className="w-4 h-4 text-[#0969da]" />
-            Door Security & Actuator Parameters
+        {/* Section 1: Door Hardware & Timing Parameters */}
+        <div className="rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-sm">
+          <div className="bg-slate-50/75 border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">Parameter Keamanan Pintu & Solenoid</h3>
+                <p className="text-[11px] text-slate-500">Nilai disinkronisasi otomatis ke ESP32 setiap 1 menit.</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase">
+              Live Hardware Link
+            </span>
           </div>
-          <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-[#24292f] mb-1">
-                Unlock Duration (Seconds)
-              </label>
+
+          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Unlock Duration */}
+            <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700">Durasi Buka Solenoid</label>
+                <span className="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  {settings.doorUnlockDuration} Detik
+                </span>
+              </div>
               <input
-                type="number"
+                type="range"
                 min="1"
                 max="30"
                 value={settings.doorUnlockDuration}
                 onChange={(e) => setSettings({ ...settings, doorUnlockDuration: Number(e.target.value) })}
-                className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
-                required
+                className="w-full accent-emerald-600 cursor-pointer"
               />
-              <p className="text-xs text-[#57606a] mt-1">How long the 12V solenoid stays energized.</p>
+              <p className="text-[11px] text-slate-500 leading-tight">
+                Lama plunger solenoid 12V ditarik masuk setelah tap kartu valid.
+              </p>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#24292f] mb-1">
-                Door Ajar Alarm Timeout (Seconds)
-              </label>
+            {/* Door Ajar Alarm Timeout */}
+            <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700">Timeout Door Ajar (Alarm)</label>
+                <span className="text-xs font-mono font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                  {settings.doorAjarTimeout} Detik
+                </span>
+              </div>
               <input
-                type="number"
+                type="range"
                 min="5"
                 max="120"
+                step="5"
                 value={settings.doorAjarTimeout}
                 onChange={(e) => setSettings({ ...settings, doorAjarTimeout: Number(e.target.value) })}
-                className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
-                required
+                className="w-full accent-amber-600 cursor-pointer"
               />
-              <p className="text-xs text-[#57606a] mt-1">Trigger buzzer alarm if door stays open past this limit.</p>
+              <p className="text-[11px] text-slate-500 leading-tight">
+                Batas waktu pintu dibiarkan terbuka sebelum musik Kasane Teto dan alarm berbunyi.
+              </p>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#24292f] mb-1">
-                Tap Cooldown (Seconds)
-              </label>
+            {/* Tap Cooldown */}
+            <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700">Tap Cooldown (Anti-Bounce)</label>
+                <span className="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                  {settings.tapCooldown} Detik
+                </span>
+              </div>
               <input
-                type="number"
+                type="range"
                 min="1"
-                max="60"
+                max="15"
                 value={settings.tapCooldown}
                 onChange={(e) => setSettings({ ...settings, tapCooldown: Number(e.target.value) })}
-                className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
-                required
+                className="w-full accent-indigo-600 cursor-pointer"
               />
-              <p className="text-xs text-[#57606a] mt-1">Anti-bounce delay before reading the same NFC card again.</p>
+              <p className="text-[11px] text-slate-500 leading-tight">
+                Jeda sebelum kartu RFID yang sama dapat dibaca kembali untuk mencegah double-tap.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Telegram Alerts */}
-        <div className="border border-[#d0d7de] rounded-md overflow-hidden bg-white">
-          <div className="bg-[#f6f8fa] border-b border-[#d0d7de] px-4 py-3 flex items-center gap-2 text-sm font-semibold text-[#24292f]">
-            <Bell className="w-4 h-4 text-[#0969da]" />
-            Telegram Security Alerts (Bot API)
+        {/* Section 2: Telegram Bot API Alerts */}
+        <div className="rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-sm">
+          <div className="bg-slate-50/75 border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                <Bell className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">Notifikasi Telegram Bot Alert</h3>
+                <p className="text-[11px] text-slate-500">Kirim peringatan instan keamanan langsung ke HP administrator.</p>
+              </div>
+            </div>
           </div>
-          <div className="p-4 space-y-4">
+
+          <div className="p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Telegram Bot Token
                 </label>
                 <input
@@ -249,12 +292,12 @@ export default function SettingsView() {
                   value={settings.telegramBotToken}
                   onChange={(e) => setSettings({ ...settings, telegramBotToken: e.target.value })}
                   placeholder="e.g. 123456789:ABCdefGHIjkl..."
-                  className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm font-mono outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
+                  className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#24292f] mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Telegram Chat ID / Channel ID
                 </label>
                 <input
@@ -262,46 +305,46 @@ export default function SettingsView() {
                   value={settings.telegramChatId}
                   onChange={(e) => setSettings({ ...settings, telegramChatId: e.target.value })}
                   placeholder="e.g. -100123456789"
-                  className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm font-mono outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
+                  className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
                 />
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <label className="flex items-center gap-2 cursor-pointer text-sm text-[#24292f]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-700">
                 <input
                   type="checkbox"
                   checked={settings.alertOnDenied}
                   onChange={(e) => setSettings({ ...settings, alertOnDenied: e.target.checked })}
-                  className="rounded text-[#0969da] focus:ring-[#0969da]"
+                  className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                Send alert on unauthorized tap (Kartu Ditolak)
+                <span>Kirim alert saat kartu ditolak (Akses Ilegal)</span>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer text-sm text-[#24292f]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-700">
                 <input
                   type="checkbox"
                   checked={settings.alertOnDoorAjar}
                   onChange={(e) => setSettings({ ...settings, alertOnDoorAjar: e.target.checked })}
-                  className="rounded text-[#0969da] focus:ring-[#0969da]"
+                  className="rounded text-blue-600 focus:ring-blue-500"
                 />
-                Send alert when door is held open (Door Ajar Alarm)
+                <span>Kirim alert saat pintu terbuka terlalu lama (Door Ajar)</span>
               </label>
             </div>
 
-            <div className="pt-3 border-t border-[#d0d7de] flex flex-wrap items-center justify-between gap-3">
+            <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={handleTestTelegram}
                 disabled={testingTelegram}
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-[#d0d7de] rounded-md text-xs font-semibold text-[#24292f] bg-[#f6f8fa] hover:bg-[#eaeef2] transition cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-2 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer disabled:opacity-50"
               >
-                <Bell className={`w-3.5 h-3.5 ${testingTelegram ? 'animate-bounce text-[#0969da]' : 'text-[#0969da]'}`} />
-                {testingTelegram ? 'Mengirim pesan uji coba...' : 'Test Kirim Alert Telegram'}
+                <Send className={`w-3.5 h-3.5 text-blue-600 ${testingTelegram ? 'animate-bounce' : ''}`} />
+                <span>{testingTelegram ? 'Mengirim...' : 'Test Kirim Alert Telegram'}</span>
               </button>
 
               {testResult && (
-                <span className="text-xs font-medium text-[#24292f]">
+                <span className="text-xs font-semibold text-slate-600">
                   {testResult}
                 </span>
               )}
@@ -309,64 +352,71 @@ export default function SettingsView() {
           </div>
         </div>
 
-        {/* Backend & Cloud Synchronization */}
-        <div className="border border-[#d0d7de] rounded-md overflow-hidden bg-white">
-          <div className="bg-[#f6f8fa] border-b border-[#d0d7de] px-4 py-3 flex items-center justify-between text-sm font-semibold text-[#24292f]">
-            <div className="flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-[#0969da]" />
-              Cloud Architecture & Backend Settings
+        {/* Section 3: Supabase Cloud & Offline Sync */}
+        <div className="rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-sm">
+          <div className="bg-slate-50/75 border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                <Cpu className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">Supabase Cloud & Offline-First Gateway</h3>
+                <p className="text-[11px] text-slate-500">Konfigurasi sinkronisasi antrean offline lokal ke cloud database.</p>
+              </div>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[#dafbe1] text-[#1a7f37] font-medium border border-[#4ac26b66] flex items-center gap-1">
-              <Radio className="w-3 h-3 animate-pulse" /> Fully Supabase Connected
+            <span className="text-xs px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 flex items-center gap-1.5">
+              <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" /> Fully Connected
             </span>
           </div>
-          <div className="p-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-[#24292f] mb-1">
-                  Supabase Project URL
-                </label>
-                <input
-                  type="text"
-                  value={settings.supabaseEndpoint}
-                  readOnly
-                  className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm font-mono bg-[#f6f8fa] text-[#57606a] cursor-not-allowed"
-                />
-                <p className="text-xs text-[#57606a] mt-1">Configured in .env as primary real-time database.</p>
-              </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-[#24292f] mb-1">
-                  Offline Sync Retry Interval (Seconds)
-                </label>
-                <input
-                  type="number"
-                  min="5"
-                  max="300"
-                  value={settings.autoSyncInterval}
-                  onChange={(e) => setSettings({ ...settings, autoSyncInterval: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 border border-[#d0d7de] rounded-md text-sm outline-none focus:border-[#0969da] focus:ring-1 focus:ring-[#0969da]"
-                  required
-                />
-                <p className="text-xs text-[#57606a] mt-1">Interval for ESP32 background task to drain SPIFFS offline queue.</p>
-              </div>
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Supabase Project Endpoint
+              </label>
+              <input
+                type="text"
+                value={settings.supabaseEndpoint}
+                readOnly
+                className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs font-mono bg-slate-50 text-slate-500 cursor-not-allowed"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">Dikonfigurasi via .env sebagai database relasional utama.</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Interval Sync Antrean Offline (Detik)
+              </label>
+              <input
+                type="number"
+                min="5"
+                max="300"
+                value={settings.autoSyncInterval}
+                onChange={(e) => setSettings({ ...settings, autoSyncInterval: Number(e.target.value) })}
+                className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                required
+              />
+              <p className="text-[11px] text-slate-400 mt-1">Jeda proses pengurasan antrean lokal saat Wi-Fi kembali aktif.</p>
             </div>
           </div>
         </div>
 
+        {/* Save Button */}
         <div className="flex justify-end pt-2">
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 bg-[#2da44e] hover:bg-[#2c974b] text-white px-5 py-2 rounded-md font-medium text-sm transition-colors shadow-sm disabled:opacity-60 cursor-pointer"
+            className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs transition shadow-md shadow-emerald-600/20 disabled:opacity-60 cursor-pointer"
           >
             {saving ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" /> Saving to Supabase...
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                <span>Menyimpan ke Supabase...</span>
               </>
             ) : (
               <>
-                <Save className="w-4 h-4" /> Save Configuration
+                <Save className="w-4 h-4" />
+                <span>Simpan Konfigurasi (Save Configuration)</span>
               </>
             )}
           </button>
